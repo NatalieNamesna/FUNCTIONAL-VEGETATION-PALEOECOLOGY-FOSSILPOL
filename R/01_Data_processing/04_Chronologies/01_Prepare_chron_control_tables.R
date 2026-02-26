@@ -34,8 +34,10 @@ RUtilpol::output_heading(
   msg = "Starting preparing chronology control tables for AD modeling"
 )
 
+
+
 # Prepare calibration curves
-RFossilpol::chron_prepare_cal_curves()
+# RFossilpol::chron_prepare_cal_curves()
 
 
 #----------------------------------------------------------#

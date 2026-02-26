@@ -43,7 +43,7 @@ full_chron_table <-
 RFossilpol::chron_recalibrate_ad_models(
   data_source = full_chron_table,
   batch_size = batch_size, # [config_criteria]
-  number_of_cores = number_of_cores, # [config_criteria]
+  number_of_cores = 1, # [config_criteria]
   default_iteration = default_iteration, # [config_criteria]
   default_burn = default_burn, # [config_criteria]
   default_thin = default_thin, # [config_criteria]
@@ -56,3 +56,4 @@ RFossilpol::chron_recalibrate_ad_models(
   # single record. User can increase this if a records is being skipped
   # before finishing estimation.
 )
+
