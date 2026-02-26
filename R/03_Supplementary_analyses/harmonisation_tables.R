@@ -103,25 +103,32 @@ joined_empty_Birks_tables_North_America <-
 #----------------------------------------------------------#
 
 # Asian Levant
-
+NA_Asia_Levant <- joined_empty_Birks_tables_Asia_Levant %>% 
+  filter(is.na(level_1.y))
 
 # Asia Main
-
+NA_Asia_Main <- joined_empty_Birks_tables_Asia_Main %>% 
+  filter(is.na(level_1.y))
 
 # Asia Siberia
-
+NA_Asia_Siberia <- joined_empty_Birks_tables_Asia_Siberia %>% 
+  filter(is.na(level_1.y))
 
 # Europe
-
+NA_Europe <- joined_empty_Birks_tables_Europe %>% 
+  filter(is.na(level_1.y))
 
 # Indopacific
-
+NA_Indopacific <- joined_empty_Birks_tables_Indospecific %>% 
+  filter(is.na(level_1.y))
 
 # Latin America
-
+NA_Latin_America <- joined_empty_Birks_tables_Latin_America %>% 
+  filter(is.na(level_1.y))
 
 # North America
-
+NA_North_America <- joined_empty_Birks_tables_North_America %>% 
+  filter(is.na(level_1.y))
 
 
 
