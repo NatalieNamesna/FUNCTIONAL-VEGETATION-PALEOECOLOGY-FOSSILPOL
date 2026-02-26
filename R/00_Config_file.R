@@ -215,7 +215,7 @@ set_seed <- 1234
 default_iteration <- 10e3
 default_burn <- 2000
 default_thin <- 8 # [USER]
-iteration_multiplier <- 5 # [USER]
+iteration_multiplier <- 1 # [USER]
 
 
 #--------------------------------------------------#
