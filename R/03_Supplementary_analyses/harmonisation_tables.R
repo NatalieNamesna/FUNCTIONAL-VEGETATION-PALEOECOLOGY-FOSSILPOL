@@ -12,13 +12,13 @@
 # 1. Load Birks tables -----
 #------------------------------------------------------------------------------#
 
-Birks_Asia_Levant <- read.csv("Data/Input/Harmonisation_tables/Birks/Asia_Levant_2023-04-06.csv")
-Birks_Asia_Main <- read.csv("Data/Input/Harmonisation_tables/Birks/Asia_Main_2023-04-06.csv")
-Birks_Asia_Siberia <- read.csv("Data/Input/Harmonisation_tables/Birks/Asia_Siberia_2023-04-06.csv")
-Birks_Europe <- read.csv("Data/Input/Harmonisation_tables/Birks/Europe_2023-04-06.csv")
-Birks_Indopacific <- read.csv("Data/Input/Harmonisation_tables/Birks/Indopacific_2023-04-06.csv")
-Birks_Latin_America <- read.csv("Data/Input/Harmonisation_tables/Birks/Latin_America_2023-04-06.csv")
-Birks_North_America <- read.csv("Data/Input/Harmonisation_tables/Birks/North_America_2023-04-06.csv")
+Birks_Asia_Levant <- readr::read_csv("Data/Input/Harmonisation_tables/Birks/Asia_Levant_2023-04-06.csv")
+Birks_Asia_Main <- readr::read_csv("Data/Input/Harmonisation_tables/Birks/Asia_Main_2023-04-06.csv")
+Birks_Asia_Siberia <- readr::read_csv("Data/Input/Harmonisation_tables/Birks/Asia_Siberia_2023-04-06.csv")
+Birks_Europe <- readr::read_csv("Data/Input/Harmonisation_tables/Birks/Europe_2023-04-06.csv")
+Birks_Indopacific <- readr::read_csv("Data/Input/Harmonisation_tables/Birks/Indopacific_2023-04-06.csv")
+Birks_Latin_America <- readr::read_csv("Data/Input/Harmonisation_tables/Birks/Latin_America_2023-04-06.csv")
+Birks_North_America <- readr::read_csv("Data/Input/Harmonisation_tables/Birks/North_America_2023-04-06.csv")
 
 #------------------------------------------------------------------------------#
 # 2. Make taxon name unique -----
@@ -56,13 +56,30 @@ unique_Birks_North_America <- Birks_North_America %>%
 # 3. Load each empty table -----
 #------------------------------------------------------------------------------#
 
-empty_Asia_Levant <- read.csv("Data/Input/Harmonisation_tables/Asia_Levant_2026-02-24.csv")
-empty_Asia_Main <- read.csv("Data/Input/Harmonisation_tables/Asia_Main_2026-02-24.csv")
-empty_Asia_Siberia <- read.csv("Data/Input/Harmonisation_tables/Asia_Siberia_2026-02-24.csv")
-empty_Europe <- read.csv("Data/Input/Harmonisation_tables/Europe_2026-02-24.csv")
-empty_Indopacific <- read.csv("Data/Input/Harmonisation_tables/IndoPacific_2026-02-24.csv")
-empty_Latin_America <- read.csv("Data/Input/Harmonisation_tables/Latin_America_2026-02-24.csv")
-empty_North_America <- read.csv("Data/Input/Harmonisation_tables/North_America_2026-02-24.csv")
+empty_Asia_Levant <- read_csv("Data/Input/Harmonisation_tables/Asia_Levant_2026-02-24.csv") %>% 
+  dplyr::select(-level_1)
+
+empty_Asia_Main <- read_csv("Data/Input/Harmonisation_tables/Asia_Main_2026-02-24.csv")%>% 
+  dplyr::select(-level_1)
+
+empty_Asia_Siberia <- read_csv("Data/Input/Harmonisation_tables/Asia_Siberia_2026-02-24.csv")%>% 
+  dplyr::select(-level_1)
+
+empty_Europe <- read_csv("Data/Input/Harmonisation_tables/Europe_2026-02-24.csv")%>% 
+  dplyr::select(-level_1)
+
+empty_Indopacific <- read_csv("Data/Input/Harmonisation_tables/IndoPacific_2026-02-24.csv")%>% 
+  dplyr::select(-level_1)
+                
+empty_Latin_America <- read_csv("Data/Input/Harmonisation_tables/Latin_America_2026-02-24.csv")%>% 
+  dplyr::select(-level_1)
+
+empty_North_America <- read_csv("Data/Input/Harmonisation_tables/North_America_2026-02-24.csv")%>% 
+  dplyr::select(-level_1)
+
+taxa_reference_table <- readr::read_csv(
+  here::here("Data/Input/Harmonisation_tables/taxa_reference_table_2026-02-27.csv")
+)
 
 
 #------------------------------------------------------------------------------#
@@ -104,15 +121,15 @@ joined_empty_Birks_tables_North_America <-
 
 # Asian Levant
 NA_Asia_Levant <- joined_empty_Birks_tables_Asia_Levant %>% 
-  filter(is.na(level_1.y))
+  filter(is.na(level_1))
 
 # Asia Main
 NA_Asia_Main <- joined_empty_Birks_tables_Asia_Main %>% 
-  filter(is.na(level_1.y))
+  filter(is.na(level_1))
 
 # Asia Siberia
 NA_Asia_Siberia <- joined_empty_Birks_tables_Asia_Siberia %>% 
-  filter(is.na(level_1.y))
+  filter(is.na(level_1))
 
 # Europe
 NA_Europe <- joined_empty_Birks_tables_Europe %>% 
@@ -142,12 +159,13 @@ remotes::install_github("OndrejMottl/taxospace")
 # Attach the package
 library(taxospace)
 
-# Clean taxon names 
+# Clean taxon names ----
 
-# Asia Levant 
+# Asia Levant - clean names
 NA_Asia_Levant_clean <- NA_Asia_Levant %>% 
   mutate(
     taxon_clean = taxon_name %>% 
+      str_remove("cf_") %>% 
       str_remove("_type") %>% 
       str_remove("_undiff") %>% 
       str_remove("_broken") %>% 
@@ -155,6 +173,8 @@ NA_Asia_Levant_clean <- NA_Asia_Levant %>%
       str_remove("_degraded") %>% 
       str_remove("_corroded") %>% 
       str_remove("_obscured") %>% 
+      str_remove("_sensu_lato") %>%
+      str_remove("_bigger_than_37_mu_m") %>%
       str_replace_all("_", " ") %>% 
       str_replace(
         "polygonum aviculare bistorta officinalis",
@@ -163,12 +183,16 @@ NA_Asia_Levant_clean <- NA_Asia_Levant %>%
       str_replace(
         "sarcopoterium spinosum poterium sanguisorba",
         "sarcopoterium spinosum|poterium sanguisorba"
-      )
+      )  
   ) %>%
-  separate_rows(taxon_clean, sep = "\\|")
-  
-
-
+  separate_rows(taxon_clean, sep = "\\|") %>% 
+  # Do names with capital letters
+  mutate(
+    taxon_clean_cap = str_c(
+      str_to_upper(str_sub(taxon_clean, 1, 1)),
+      str_sub(taxon_clean, 2)
+    )
+  )
 
 # Asia Main
 NA_Asia_Main_clean <- NA_Asia_Main %>% 
@@ -187,6 +211,15 @@ NA_Asia_Main_clean <- NA_Asia_Main %>%
       )
   ) %>% 
   separate_rows(taxon_clean, sep = "\\|")
+
+# Do names with capital letters
+NA_Asia_Main_clean <- NA_Asia_Main_clean %>% 
+  mutate(
+    taxon_clean_cap = str_c(
+      str_to_upper(str_sub(taxon_clean, 1, 1)),
+      str_sub(taxon_clean, 2)
+    )
+  )
 
 # Asia Siberia
 NA_Asia_Siberia_clean <- NA_Asia_Siberia %>% 
@@ -209,7 +242,16 @@ NA_Asia_Siberia_clean <- NA_Asia_Siberia %>%
         "allium sibiricum"
       )
     )
-      
+
+# Do names with capital letters
+NA_Asia_Siberia_clean <- NA_Asia_Siberia_clean %>% 
+  mutate(
+    taxon_clean_cap = str_c(
+      str_to_upper(str_sub(taxon_clean, 1, 1)),
+      str_sub(taxon_clean, 2)
+    )
+  )
+
 
 # Europe
 NA_Europe_clean <- NA_Europe %>% 
@@ -246,6 +288,14 @@ NA_Europe_clean <- NA_Europe %>%
       str_replace_all("_", " ")
     )
 
+# Do names with capital letters
+NA_Europe_clean <- NA_Europe_clean %>% 
+  mutate(
+    taxon_clean_cap = str_c(
+      str_to_upper(str_sub(taxon_clean, 1, 1)),
+      str_sub(taxon_clean, 2)
+    )
+  )
 
 # Indopacific
 NA_Indopacific_clean <- NA_Indopacific %>% 
@@ -268,6 +318,15 @@ NA_Indopacific_clean <- NA_Indopacific %>%
       str_replace_all("_", " ")
   )
 
+
+# Do names with capital letters
+NA_Indopacific_clean <- NA_Indopacific_clean %>% 
+  mutate(
+    taxon_clean_cap = str_c(
+      str_to_upper(str_sub(taxon_clean, 1, 1)),
+      str_sub(taxon_clean, 2)
+    )
+  )
 
 # Latin America
 NA_Latin_America_clean <- NA_Latin_America %>% 
@@ -294,6 +353,15 @@ NA_Latin_America_clean <- NA_Latin_America %>%
       str_replace_all("_", " ")
   )
 
+# Do names with capital letters
+NA_Latin_America_clean <- NA_Latin_America_clean %>% 
+  mutate(
+    taxon_clean_cap = str_c(
+      str_to_upper(str_sub(taxon_clean, 1, 1)),
+      str_sub(taxon_clean, 2)
+    )
+  )
+
 
 # North America
 
@@ -310,8 +378,102 @@ NA_North_America_clean <- NA_North_America %>%
       str_replace_all("_", " ")
   )
 
+# Do names with capital letters
+NA_North_America_clean <- NA_North_America_clean %>% 
+  mutate(
+    taxon_clean_cap = str_c(
+      str_to_upper(str_sub(taxon_clean, 1, 1)),
+      str_sub(taxon_clean, 2)
+    )
+  )
 
-# 
+
+# Using {taxospace} for completing missing classification ----
+
+# Asia Levant
+
+# Make vector with clean taxon names
+taxa_vec_Asia_Levant <- NA_Asia_Levant_clean %>%
+  distinct(taxon_clean_cap) %>% # get unique values
+  pull(taxon_clean_cap) # extracting column, pull() makes vector / select() makes data frame
+
+# other cleaning
+taxa_vec_Asia_Levant_clean <- taxa_vec_Asia_Levant %>%
+  str_replace(" [A-Z].*$", "")
+
+# Get classification for Asia Levant
+classification_Asia_Levant <-
+  taxa_vec_Asia_Levant[1:10] %>% 
+  rlang::set_names() %>% 
+  purrr::map(
+    .progress = TRUE,
+    .x = .,
+    .f = ~ taxospace::get_classification(.x)) %>% 
+  bind_rows() 
+
+classification_Asia_Levant %>% 
+  dplyr::select(sel_name, classification) %>% 
+  tidyr::unnest(classification) %>% 
+  dplyr::select(-id) %>%
+  group_by(sel_name) %>% 
+  slice_tail(n = 1) 
+
+classification_Asia_Levant %>% 
+  dplyr::select(sel_name, classification) %>% 
+  tidyr::unnest(classification) %>% 
+  dplyr::select(-id) %>%
+  pivot_wider(
+    names_from = rank, 
+    values_from = name
+  ) %>% 
+  dplyr::mutate(
+    level_1 = dplyr::case_when(
+      .default = family,
+      !is.na(genus) ~  genus
+    )) %>% 
+  dplyr::select(sel_name, level_1)
+
+# Asia Main
+
+# Make vector with clean taxon names
+taxa_vec_Asia_Main <- NA_Asia_Main_clean %>%
+  distinct(taxon_clean_cap) %>%
+  pull(taxon_clean_cap) # extracting column, pull() makes vector / select() makes data frame
+
+# Get classification for Asia Main
+classification_Asia_Main <- taxospace::get_classification(taxa_vec_Asia_Main)
+
+
+# Asia Siberia
+taxa_vec_Asia_Siberia <- NA_Asia_Siberia_clean %>%
+  distinct(taxon_clean_cap) %>%
+  pull(taxon_clean_cap)
+
+
+# Europe
+taxa_vec_Europe <- NA_Europe_clean %>%
+  distinct(taxon_clean_cap) %>%
+  pull(taxon_clean_cap)
+
+
+# Indopacific
+taxa_vec_Indopacific <- NA_Indopacific_clean %>%
+  distinct(taxon_clean_cap) %>%
+  pull(taxon_clean_cap)
+
+
+# Latin America
+taxa_vec_Latin_America <- NA_Latin_America_clean %>%
+  distinct(taxon_clean_cap) %>%
+  pull(taxon_clean_cap)
+
+
+# North America
+taxa_vec_North_America <- NA_North_America_clean %>%
+  distinct(taxon_clean_cap) %>%
+  pull(taxon_clean_cap)
+
+
 
 
 
