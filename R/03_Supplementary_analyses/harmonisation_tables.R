@@ -133,19 +133,19 @@ NA_Asia_Siberia <- joined_empty_Birks_tables_Asia_Siberia %>%
 
 # Europe
 NA_Europe <- joined_empty_Birks_tables_Europe %>% 
-  filter(is.na(level_1.y))
+  filter(is.na(level_1))
 
 # Indopacific
 NA_Indopacific <- joined_empty_Birks_tables_Indospecific %>% 
-  filter(is.na(level_1.y))
+  filter(is.na(level_1))
 
 # Latin America
 NA_Latin_America <- joined_empty_Birks_tables_Latin_America %>% 
-  filter(is.na(level_1.y))
+  filter(is.na(level_1))
 
 # North America
 NA_North_America <- joined_empty_Birks_tables_North_America %>% 
-  filter(is.na(level_1.y))
+  filter(is.na(level_1))
 
 
 #------------------------------------------------------------------------------#
@@ -210,10 +210,8 @@ NA_Asia_Main_clean <- NA_Asia_Main %>%
         "polygonum aviculare|bistorta officinalis"
       )
   ) %>% 
-  separate_rows(taxon_clean, sep = "\\|")
-
+  separate_rows(taxon_clean, sep = "\\|") %>% 
 # Do names with capital letters
-NA_Asia_Main_clean <- NA_Asia_Main_clean %>% 
   mutate(
     taxon_clean_cap = str_c(
       str_to_upper(str_sub(taxon_clean, 1, 1)),
@@ -241,10 +239,9 @@ NA_Asia_Siberia_clean <- NA_Asia_Siberia %>%
         "allium cf a sibiricum",
         "allium sibiricum"
       )
-    )
+    ) %>% 
 
 # Do names with capital letters
-NA_Asia_Siberia_clean <- NA_Asia_Siberia_clean %>% 
   mutate(
     taxon_clean_cap = str_c(
       str_to_upper(str_sub(taxon_clean, 1, 1)),
@@ -286,10 +283,9 @@ NA_Europe_clean <- NA_Europe %>%
       str_remove("_1") %>%
       str_remove("_2") %>% 
       str_replace_all("_", " ")
-    )
+    ) %>% 
 
 # Do names with capital letters
-NA_Europe_clean <- NA_Europe_clean %>% 
   mutate(
     taxon_clean_cap = str_c(
       str_to_upper(str_sub(taxon_clean, 1, 1)),
@@ -316,11 +312,8 @@ NA_Indopacific_clean <- NA_Indopacific %>%
       str_remove("_1") %>% 
       str_remove("cf_") %>% 
       str_replace_all("_", " ")
-  )
-
-
+  ) %>% 
 # Do names with capital letters
-NA_Indopacific_clean <- NA_Indopacific_clean %>% 
   mutate(
     taxon_clean_cap = str_c(
       str_to_upper(str_sub(taxon_clean, 1, 1)),
@@ -351,10 +344,8 @@ NA_Latin_America_clean <- NA_Latin_America %>%
       str_remove("_undiff") %>%
       str_remove("cf_") %>%
       str_replace_all("_", " ")
-  )
-
+  ) %>% 
 # Do names with capital letters
-NA_Latin_America_clean <- NA_Latin_America_clean %>% 
   mutate(
     taxon_clean_cap = str_c(
       str_to_upper(str_sub(taxon_clean, 1, 1)),
@@ -376,10 +367,8 @@ NA_North_America_clean <- NA_North_America %>%
       str_remove("cf_") %>%
       str_remove("_undiff") %>% 
       str_replace_all("_", " ")
-  )
-
+  ) %>% 
 # Do names with capital letters
-NA_North_America_clean <- NA_North_America_clean %>% 
   mutate(
     taxon_clean_cap = str_c(
       str_to_upper(str_sub(taxon_clean, 1, 1)),
@@ -403,7 +392,7 @@ taxa_vec_Asia_Levant_clean <- taxa_vec_Asia_Levant %>%
 
 # Get classification for Asia Levant
 classification_Asia_Levant <-
-  taxa_vec_Asia_Levant[1:10] %>% 
+  taxa_vec_Asia_Levant %>% 
   rlang::set_names() %>% 
   purrr::map(
     .progress = TRUE,
@@ -411,6 +400,7 @@ classification_Asia_Levant <-
     .f = ~ taxospace::get_classification(.x)) %>% 
   bind_rows() 
 
+# my idea - not that good
 classification_Asia_Levant %>% 
   dplyr::select(sel_name, classification) %>% 
   tidyr::unnest(classification) %>% 
@@ -418,6 +408,8 @@ classification_Asia_Levant %>%
   group_by(sel_name) %>% 
   slice_tail(n = 1) 
 
+# get table of finest classification -> Ondra's idea - very good
+get_finest_classification_Asia_Levant <-
 classification_Asia_Levant %>% 
   dplyr::select(sel_name, classification) %>% 
   tidyr::unnest(classification) %>% 
@@ -428,10 +420,12 @@ classification_Asia_Levant %>%
   ) %>% 
   dplyr::mutate(
     level_1 = dplyr::case_when(
-      .default = family,
-      !is.na(genus) ~  genus
-    )) %>% 
+      genus == "NULL" ~  family,
+      .default = genus
+    )
+  ) %>% 
   dplyr::select(sel_name, level_1)
+
 
 # Asia Main
 
@@ -441,7 +435,14 @@ taxa_vec_Asia_Main <- NA_Asia_Main_clean %>%
   pull(taxon_clean_cap) # extracting column, pull() makes vector / select() makes data frame
 
 # Get classification for Asia Main
-classification_Asia_Main <- taxospace::get_classification(taxa_vec_Asia_Main)
+
+
+
+
+# get table of finest classification
+
+
+
 
 
 # Asia Siberia
@@ -449,17 +450,42 @@ taxa_vec_Asia_Siberia <- NA_Asia_Siberia_clean %>%
   distinct(taxon_clean_cap) %>%
   pull(taxon_clean_cap)
 
+# Get classification for Asia Main
+
+
+
+# get table of finest classification
+
+
+
 
 # Europe
 taxa_vec_Europe <- NA_Europe_clean %>%
   distinct(taxon_clean_cap) %>%
   pull(taxon_clean_cap)
 
+# Get classification for Asia Main
+
+
+
+# get table of finest classification
+
+
+
+
 
 # Indopacific
 taxa_vec_Indopacific <- NA_Indopacific_clean %>%
   distinct(taxon_clean_cap) %>%
   pull(taxon_clean_cap)
+
+# Get classification for Asia Main
+
+
+
+# get table of finest classification
+
+
 
 
 # Latin America
@@ -468,17 +494,26 @@ taxa_vec_Latin_America <- NA_Latin_America_clean %>%
   pull(taxon_clean_cap)
 
 
+# Get classification for Asia Main
+
+
+
+# get table of finest classification
+
+
+
+
 # North America
 taxa_vec_North_America <- NA_North_America_clean %>%
   distinct(taxon_clean_cap) %>%
   pull(taxon_clean_cap)
 
 
+# Get classification for Asia Main
 
 
 
-
-
+# get table of finest classification
 
 
 
