@@ -149,8 +149,8 @@ NA_North_America <- joined_empty_Birks_tables_North_America %>%
 
 
 #------------------------------------------------------------------------------#
-# 6. Use {taxospace} to get the classification for the missing taxons 
-# - harm table B  -----
+# 6.Use {taxospace} to get the classification for the missing taxons ----
+# - harm table B  
 #------------------------------------------------------------------------------#
 
 # install.packages("remotes")
@@ -159,9 +159,9 @@ remotes::install_github("OndrejMottl/taxospace")
 # Attach the package
 library(taxospace)
 
-# Clean taxon names ----
+## Clean taxon names ----
 
-# Asia Levant - clean names
+### Asia Levant ----
 NA_Asia_Levant_clean <- NA_Asia_Levant %>% 
   mutate(
     taxon_clean = taxon_name %>% 
@@ -194,7 +194,7 @@ NA_Asia_Levant_clean <- NA_Asia_Levant %>%
     )
   )
 
-# Asia Main
+### Asia Main ----
 NA_Asia_Main_clean <- NA_Asia_Main %>% 
   mutate(
     taxon_clean = taxon_name %>% 
@@ -219,7 +219,7 @@ NA_Asia_Main_clean <- NA_Asia_Main %>%
     )
   )
 
-# Asia Siberia
+### Asia Siberia ----
 NA_Asia_Siberia_clean <- NA_Asia_Siberia %>% 
   mutate(
     taxon_clean = taxon_name %>% 
@@ -250,7 +250,7 @@ NA_Asia_Siberia_clean <- NA_Asia_Siberia %>%
   )
 
 
-# Europe
+### Europe ----
 NA_Europe_clean <- NA_Europe %>% 
   mutate(
     taxon_clean = taxon_name %>% 
@@ -293,7 +293,7 @@ NA_Europe_clean <- NA_Europe %>%
     )
   )
 
-# Indopacific
+### Indopacific ----
 NA_Indopacific_clean <- NA_Indopacific %>% 
   mutate(
     taxon_clean = taxon_name %>%
@@ -321,7 +321,7 @@ NA_Indopacific_clean <- NA_Indopacific %>%
     )
   )
 
-# Latin America
+### Latin America ----
 NA_Latin_America_clean <- NA_Latin_America %>% 
   mutate(
     taxon_clean = taxon_name %>%
@@ -354,7 +354,7 @@ NA_Latin_America_clean <- NA_Latin_America %>%
   )
 
 
-# North America
+### North America ----
 
 NA_North_America_clean <- NA_North_America %>% 
   mutate(
@@ -377,11 +377,9 @@ NA_North_America_clean <- NA_North_America %>%
   )
 
 
-# Using {taxospace} for completing missing classification ----
+## Using {taxospace} for completing missing classification ----
 
-
-
-# Asia Levant
+### Asia Levant ----
 
 # Make vector with clean taxon names
 taxa_vec_Asia_Levant <- NA_Asia_Levant_clean %>%
@@ -432,7 +430,7 @@ classification_Asia_Levant %>%
 
 
 
-# Asia Main
+### Asia Main ----
 
 # Make vector with clean taxon names
 taxa_vec_Asia_Main <- NA_Asia_Main_clean %>%
@@ -471,7 +469,7 @@ get_finest_classification_Asia_Main <-
 
 
 
-# Asia Siberia
+### Asia Siberia ----
 taxa_vec_Asia_Siberia <- NA_Asia_Siberia_clean %>%
   distinct(taxon_clean_cap) %>%
   pull(taxon_clean_cap)
@@ -508,7 +506,7 @@ get_finest_classification_Asia_Siberia <-
 
 
 
-# Europe
+### Europe ----
 taxa_vec_Europe <- NA_Europe_clean %>%
   distinct(taxon_clean_cap) %>%
   pull(taxon_clean_cap)
@@ -534,19 +532,22 @@ get_finest_classification_Europe <-
     values_from = name
   ) %>% 
   dplyr::mutate(
-    level_1 = dplyr::case_when(
+    level_1a = dplyr::case_when(
       genus == "NULL" ~  family,
       .default = genus
     )
   ) %>% 
+  dplyr::mutate(
+    level_1 = dplyr::if_else(
+      level_1a == "NULL", class, level_1a
+    )
+  ) %>%
   dplyr::select(sel_name, level_1)
 
 
 
 
-
-
-# Indopacific
+### Indopacific ----
 taxa_vec_Indopacific <- NA_Indopacific_clean %>%
   distinct(taxon_clean_cap) %>%
   pull(taxon_clean_cap)
@@ -588,7 +589,7 @@ get_finest_classification_Indopacific <-
 
 
 
-# Latin America
+### Latin America ----
 taxa_vec_Latin_America <- NA_Latin_America_clean %>%
   distinct(taxon_clean_cap) %>%
   pull(taxon_clean_cap)
@@ -631,7 +632,7 @@ get_finest_classification_Latin_America <-
 
 
 
-# North America
+### North America ----
 taxa_vec_North_America <- NA_North_America_clean %>%
   distinct(taxon_clean_cap) %>%
   pull(taxon_clean_cap)
@@ -664,6 +665,135 @@ get_finest_classification_North_America <-
     )
   ) %>%
   dplyr::select(sel_name, level_1)
+
+
+#------------------------------------------------------------------------------#
+# 7. Merge harmonisation tables a and b  -----
+#------------------------------------------------------------------------------#
+
+## Asia Levant ----
+
+# harm table a
+joined_empty_Birks_tables_Asia_Levant
+
+# harm table b - unlist
+get_finest_classification_Asia_Levant <- get_finest_classification_Asia_Levant %>% 
+  dplyr::mutate(
+    level_1 = map_chr(level_1, 1)
+  )
+
+
+# joining harm a and harm b tables
+
+# add new column which will match with get finest classification tables
+taxa_reference_table_2 <- taxa_reference_table %>% 
+  mutate(
+    sel_name = neotoma_names
+  )
+
+# 
+classification_with_taxon_names_Asia_Levant <- get_finest_classification_Asia_Levant %>%
+  left_join(
+    taxa_reference_table_2 %>%
+      select(taxon_name, sel_name),
+    by = "sel_name"
+  )
+
+
+## Asia Main ----
+
+# harm table a
+joined_empty_Birks_tables_Asia_Main
+
+# harm table b
+get_finest_classification_Asia_Main <- get_finest_classification_Asia_Main %>% 
+  dplyr::mutate(
+    level_1 = map_chr(level_1, 1)
+  )
+
+
+## Asia Siberia ----
+
+# harm table a
+joined_empty_Birks_tables_Asia_Siberia
+
+# harm table b
+get_finest_classification_Asia_Siberia <- get_finest_classification_Asia_Siberia %>% 
+  dplyr::mutate(
+    level_1 = map_chr(level_1, 1)
+  )
+
+
+
+## Europe ----
+
+# harm table a
+joined_empty_Birks_tables_Europe
+
+# harm table b
+get_finest_classification_Europe <- get_finest_classification_Europe %>% 
+  dplyr::mutate(
+    level_1 = map_chr(level_1, 1)
+  )
+
+
+
+## Indopacific ----
+
+# harm table a
+joined_empty_Birks_tables_Indopacific
+
+# harm table b
+get_finest_classification_Indopacific <- get_finest_classification_Indopacific %>% 
+  dplyr::mutate(
+    level_1 = map_chr(level_1, 1)
+  )
+
+
+
+
+
+## Latin America ----
+
+# harm table a
+joined_empty_Birks_tables_Latin_America
+
+# harm table b
+get_finest_classification_Latin_America <- get_finest_classification_Latin_America %>% 
+  dplyr::mutate(
+    level_1 = map_chr(level_1, 1)
+  )
+
+
+
+
+
+## North America ----
+
+# harm table a
+joined_empty_Birks_tables_North_America
+
+# harm table b
+get_finest_classification_North_America <- get_finest_classification_North_America %>% 
+  dplyr::mutate(
+    level_1 = map_chr(level_1, 1)
+  )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
