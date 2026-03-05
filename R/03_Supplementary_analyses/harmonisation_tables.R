@@ -379,6 +379,8 @@ NA_North_America_clean <- NA_North_America %>%
 
 # Using {taxospace} for completing missing classification ----
 
+
+
 # Asia Levant
 
 # Make vector with clean taxon names
@@ -427,6 +429,9 @@ classification_Asia_Levant %>%
   dplyr::select(sel_name, level_1)
 
 
+
+
+
 # Asia Main
 
 # Make vector with clean taxon names
@@ -435,11 +440,32 @@ taxa_vec_Asia_Main <- NA_Asia_Main_clean %>%
   pull(taxon_clean_cap) # extracting column, pull() makes vector / select() makes data frame
 
 # Get classification for Asia Main
-
-
-
+classification_Asia_Main <-
+  taxa_vec_Asia_Main %>% 
+  rlang::set_names() %>% 
+  purrr::map(
+    .progress = TRUE,
+    .x = .,
+    .f = ~ taxospace::get_classification(.x)) %>% 
+  bind_rows() 
 
 # get table of finest classification
+get_finest_classification_Asia_Main <-
+  classification_Asia_Main %>% 
+  dplyr::select(sel_name, classification) %>% 
+  tidyr::unnest(classification) %>% 
+  dplyr::select(-id) %>%
+  pivot_wider(
+    names_from = rank, 
+    values_from = name
+  ) %>% 
+  dplyr::mutate(
+    level_1 = dplyr::case_when(
+      is.na(genus) ~  family,
+      .default = genus
+    )
+  ) %>% 
+  dplyr::select(sel_name, level_1)
 
 
 
@@ -450,11 +476,34 @@ taxa_vec_Asia_Siberia <- NA_Asia_Siberia_clean %>%
   distinct(taxon_clean_cap) %>%
   pull(taxon_clean_cap)
 
-# Get classification for Asia Main
-
-
+# Get classification for Asia Siberia
+classification_Asia_Siberia <-
+  taxa_vec_Asia_Siberia %>% 
+  rlang::set_names() %>% 
+  purrr::map(
+    .progress = TRUE,
+    .x = .,
+    .f = ~ taxospace::get_classification(.x)) %>% 
+  bind_rows() 
 
 # get table of finest classification
+get_finest_classification_Asia_Siberia <-
+  classification_Asia_Siberia %>% 
+  dplyr::select(sel_name, classification) %>% 
+  tidyr::unnest(classification) %>% 
+  dplyr::select(-id) %>%
+  pivot_wider(
+    names_from = rank, 
+    values_from = name
+  ) %>% 
+  dplyr::mutate(
+    level_1 = dplyr::case_when(
+      genus == "NULL" ~  family,
+      .default = genus
+    )
+  ) %>% 
+  dplyr::select(sel_name, level_1)
+
 
 
 
@@ -464,11 +513,34 @@ taxa_vec_Europe <- NA_Europe_clean %>%
   distinct(taxon_clean_cap) %>%
   pull(taxon_clean_cap)
 
-# Get classification for Asia Main
-
-
+# Get classification for Asia Europe
+classification_Europe <-
+  taxa_vec_Europe %>% 
+  rlang::set_names() %>% 
+  purrr::map(
+    .progress = TRUE,
+    .x = .,
+    .f = ~ taxospace::get_classification(.x)) %>% 
+  bind_rows() 
 
 # get table of finest classification
+get_finest_classification_Europe <-
+  classification_Europe %>% 
+  dplyr::select(sel_name, classification) %>% 
+  tidyr::unnest(classification) %>% 
+  dplyr::select(-id) %>%
+  pivot_wider(
+    names_from = rank, 
+    values_from = name
+  ) %>% 
+  dplyr::mutate(
+    level_1 = dplyr::case_when(
+      genus == "NULL" ~  family,
+      .default = genus
+    )
+  ) %>% 
+  dplyr::select(sel_name, level_1)
+
 
 
 
@@ -479,11 +551,39 @@ taxa_vec_Indopacific <- NA_Indopacific_clean %>%
   distinct(taxon_clean_cap) %>%
   pull(taxon_clean_cap)
 
-# Get classification for Asia Main
-
-
+# Get classification for Indopacific
+classification_Indopacific <-
+  taxa_vec_Indopacific %>% 
+  rlang::set_names() %>% 
+  purrr::map(
+    .progress = TRUE,
+    .x = .,
+    .f = ~ taxospace::get_classification(.x)) %>% 
+  bind_rows() 
 
 # get table of finest classification
+get_finest_classification_Indopacific <-
+  classification_Indopacific %>% 
+  dplyr::select(sel_name, classification) %>% 
+  tidyr::unnest(classification) %>% 
+  dplyr::select(-id) %>%
+  pivot_wider(
+    names_from = rank, 
+    values_from = name
+  ) %>% 
+  dplyr::mutate(
+    level_1a = dplyr::case_when(
+      genus == "NULL" ~  family,
+      .default = genus
+    )
+  ) %>% 
+  dplyr::mutate(
+    level_1 = dplyr::if_else(
+      level_1a == "NULL", order, level_1a
+    )
+  ) %>%
+  dplyr::select(sel_name, level_1)
+
 
 
 
@@ -494,11 +594,39 @@ taxa_vec_Latin_America <- NA_Latin_America_clean %>%
   pull(taxon_clean_cap)
 
 
-# Get classification for Asia Main
-
-
+# Get classification for Latin America
+classification_Latin_America <-
+  taxa_vec_Latin_America %>% 
+  rlang::set_names() %>% 
+  purrr::map(
+    .progress = TRUE,
+    .x = .,
+    .f = ~ taxospace::get_classification(.x)) %>% 
+  bind_rows() 
 
 # get table of finest classification
+get_finest_classification_Latin_America <-
+  classification_Latin_America %>% 
+  dplyr::select(sel_name, classification) %>% 
+  tidyr::unnest(classification) %>% 
+  dplyr::select(-id) %>%
+  pivot_wider(
+    names_from = rank, 
+    values_from = name
+  ) %>% 
+  dplyr::mutate(
+    level_1a = dplyr::case_when(
+      genus == "NULL" ~  family,
+      .default = genus
+    )
+  ) %>% 
+  dplyr::mutate(
+    level_1 = dplyr::if_else(
+      level_1a == "NULL", as.list(sel_name), level_1a
+    )
+  ) %>%
+  dplyr::select(sel_name, level_1)
+
 
 
 
@@ -508,13 +636,34 @@ taxa_vec_North_America <- NA_North_America_clean %>%
   distinct(taxon_clean_cap) %>%
   pull(taxon_clean_cap)
 
-
-# Get classification for Asia Main
-
+# Get classification for North America
+classification_North_America <-
+  taxa_vec_North_America %>% 
+  rlang::set_names() %>% 
+  purrr::map(
+    .progress = TRUE,
+    .x = .,
+    .f = ~ taxospace::get_classification(.x)) %>% 
+  bind_rows() 
 
 
 # get table of finest classification
-
+get_finest_classification_North_America <-
+  classification_North_America %>% 
+  dplyr::select(sel_name, classification) %>% 
+  tidyr::unnest(classification) %>% 
+  dplyr::select(-id) %>%
+  pivot_wider(
+    names_from = rank, 
+    values_from = name
+  ) %>% 
+  dplyr::mutate(
+    level_1 = dplyr::case_when(
+      genus == "NULL" ~  family,
+      .default = genus
+    )
+  ) %>%
+  dplyr::select(sel_name, level_1)
 
 
 
