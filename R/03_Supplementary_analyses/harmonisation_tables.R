@@ -88,31 +88,31 @@ taxa_reference_table <- readr::read_csv(
 
 # Asia Levant
 joined_empty_Birks_tables_Asia_Levant <-
-  left_join(empty_Asia_Levant, Birks_Asia_Levant, by = "taxon_name")
+  left_join(empty_Asia_Levant, unique_Birks_Asia_Levant, by = "taxon_name")
 
 # Asia Main
 joined_empty_Birks_tables_Asia_Main <-
-  left_join(empty_Asia_Main, Birks_Asia_Main, by = "taxon_name")
+  left_join(empty_Asia_Main, unique_Birks_Asia_Main, by = "taxon_name")
 
 # Asia Siberia
 joined_empty_Birks_tables_Asia_Siberia <-
-  left_join(empty_Asia_Siberia, Birks_Asia_Siberia, by = "taxon_name")
+  left_join(empty_Asia_Siberia, unique_Birks_Asia_Siberia, by = "taxon_name")
 
 # Europe
 joined_empty_Birks_tables_Europe <-
-  left_join(empty_Europe, Birks_Europe, by = "taxon_name")
+  left_join(empty_Europe, unique_Birks_Europe, by = "taxon_name")
 
 # Indopacific
 joined_empty_Birks_tables_Indospecific <-
-  left_join(empty_Indopacific, Birks_Indopacific, by = "taxon_name")
+  left_join(empty_Indopacific, unique_Birks_Indopacific, by = "taxon_name")
 
 # Latin America
 joined_empty_Birks_tables_Latin_America <-
-  left_join(empty_Latin_America, Birks_Latin_America, by = "taxon_name")
+  left_join(empty_Latin_America, unique_Birks_Latin_America, by = "taxon_name")
 
 # North America
 joined_empty_Birks_tables_North_America <-
-  left_join(empty_North_America, Birks_North_America, by = "taxon_name")
+  left_join(empty_North_America, unique_Birks_North_America, by = "taxon_name")
 
 
 #------------------------------------------------------------------------------#
@@ -165,16 +165,7 @@ library(taxospace)
 NA_Asia_Levant_clean <- NA_Asia_Levant %>% 
   mutate(
     taxon_clean = taxon_name %>% 
-      str_remove("cf_") %>% 
-      str_remove("_type") %>% 
-      str_remove("_undiff") %>% 
-      str_remove("_broken") %>% 
-      str_remove("_crumpled") %>% 
-      str_remove("_degraded") %>% 
-      str_remove("_corroded") %>% 
-      str_remove("_obscured") %>% 
-      str_remove("_sensu_lato") %>%
-      str_remove("_bigger_than_37_mu_m") %>%
+      str_remove("cf_") %>%
       str_replace_all("_", " ") %>% 
       str_replace(
         "polygonum aviculare bistorta officinalis",
@@ -198,12 +189,6 @@ NA_Asia_Levant_clean <- NA_Asia_Levant %>%
 NA_Asia_Main_clean <- NA_Asia_Main %>% 
   mutate(
     taxon_clean = taxon_name %>% 
-      str_remove("_type") %>% 
-      str_remove("_bigger_than_35_mu_m") %>% 
-      str_remove("_smaller_than_37_mu_m") %>% 
-      str_remove("bigger_than_37_mu_m") %>% 
-      str_remove("smaller_than_40_mu_m") %>% 
-      str_remove("smaller_than_35_mu_m") %>% 
       str_replace_all("_", " ") %>% 
       str_replace(
         "polygonum aviculare bistorta officinalis",
@@ -223,24 +208,9 @@ NA_Asia_Main_clean <- NA_Asia_Main %>%
 NA_Asia_Siberia_clean <- NA_Asia_Siberia %>% 
   mutate(
     taxon_clean = taxon_name %>% 
-      str_remove("_type") %>% 
-      str_remove("_undiff") %>% 
       str_remove("cf_") %>% 
-      str_replace_all("_", " ") %>%
-      str_replace(
-        "paliurus spina minus christi",
-        "palirius spina christi"
-      ) %>% 
-      str_replace(
-        "astragalus cf a alpinus",
-        "astragalus alpinus"
-      ) %>%
-      str_replace(
-        "allium cf a sibiricum",
-        "allium sibiricum"
-      )
-    ) %>% 
-
+      str_replace_all("_", " ") 
+    ) %>%
 # Do names with capital letters
   mutate(
     taxon_clean_cap = str_c(
@@ -254,37 +224,9 @@ NA_Asia_Siberia_clean <- NA_Asia_Siberia %>%
 NA_Europe_clean <- NA_Europe %>% 
   mutate(
     taxon_clean = taxon_name %>% 
-      str_remove("_33_minus_36_mu_m") %>% 
-      str_remove("_10_minus_12_mu_m") %>% 
-      str_remove("_bigger_than_35_mu_m") %>% 
-      str_remove("_bigger_than_37_mu_m") %>% 
-      str_remove("_bigger_than_45_mu_m") %>% 
-      str_remove("_excluding_secale") %>% 
-      str_remove("_37_minus_39_mu_m") %>% 
-      str_remove("_40_minus_44_mu_m") %>% 
-      str_remove("_45_minus_49_mu_m") %>% 
-      str_remove("_bigger_than_50mu_m") %>% 
-      str_remove("_type_excluding_secale") %>% 
-      str_remove("_type_indeterminable") %>% 
-      str_remove("bigger_than_20_mu_m") %>%
-      str_remove("bigger_than_40_mu_m") %>%
-      str_remove("_smaller_than_20_mu_m") %>%
-      str_remove("_smaller_than_40_mu_m") %>%
-      str_remove("_indet") %>% 
-      str_remove("_large") %>% 
-      str_remove("_small") %>% 
-      str_remove("_undiff") %>% 
-      str_remove("_sensu_lato") %>% 
       str_remove("cf_") %>% 
-      str_remove("_group") %>%
-      str_remove("_type1") %>% 
-      str_remove("_type2") %>% 
-      str_remove("_type") %>% 
-      str_remove("_1") %>%
-      str_remove("_2") %>% 
       str_replace_all("_", " ")
     ) %>% 
-
 # Do names with capital letters
   mutate(
     taxon_clean_cap = str_c(
@@ -297,19 +239,6 @@ NA_Europe_clean <- NA_Europe %>%
 NA_Indopacific_clean <- NA_Indopacific %>% 
   mutate(
     taxon_clean = taxon_name %>%
-      str_remove("_type_1_granular") %>% 
-      str_remove("_type_2_psilate") %>% 
-      str_remove("_type_3_granular") %>% 
-      str_remove("_type_4_granular") %>% 
-      str_remove("_type_anodopetalum_type") %>%
-      str_remove("_bigger_than_50_mu_m") %>% 
-      str_remove("_smaller_than_50_mu_m") %>%
-      str_remove("undiff") %>%
-      str_remove("_type_a") %>% 
-      str_remove("_type_b") %>%
-      str_remove("_type_c") %>% 
-      str_remove("_type") %>% 
-      str_remove("_1") %>% 
       str_remove("cf_") %>% 
       str_replace_all("_", " ")
   ) %>% 
@@ -325,23 +254,6 @@ NA_Indopacific_clean <- NA_Indopacific %>%
 NA_Latin_America_clean <- NA_Latin_America %>% 
   mutate(
     taxon_clean = taxon_name %>%
-      str_remove("_type_1") %>% 
-      str_remove("_type_2") %>% 
-      str_remove("_type_3") %>%
-      str_remove("_type_4") %>%
-      str_remove("_type_5") %>%
-      str_remove("_type_6") %>%
-      str_remove("_type_7") %>%
-      str_remove("_type_8") %>%
-      str_remove("_type_9") %>%
-      str_remove("_type_10") %>%
-      str_remove("_clade_type_ii_cf_acacia") %>%
-      str_remove("_bigger_than_35_mu_m") %>% 
-      str_remove("_smaller_than_35_mu_m") %>%
-      str_remove("_type_i") %>%
-      str_remove("_type_ii") %>%
-      str_remove("_type") %>%
-      str_remove("_undiff") %>%
       str_remove("cf_") %>%
       str_replace_all("_", " ")
   ) %>% 
@@ -355,17 +267,10 @@ NA_Latin_America_clean <- NA_Latin_America %>%
 
 
 ### North America ----
-
 NA_North_America_clean <- NA_North_America %>% 
   mutate(
     taxon_clean = taxon_name %>%
-      str_remove("_large") %>% 
-      str_remove("_small") %>% 
-      str_remove("_type_1") %>% 
-      str_remove("_type_2") %>% 
-      str_remove("_type") %>% 
       str_remove("cf_") %>%
-      str_remove("_undiff") %>% 
       str_replace_all("_", " ")
   ) %>% 
 # Do names with capital letters
@@ -383,7 +288,7 @@ NA_North_America_clean <- NA_North_America %>%
 
 # Make vector with clean taxon names
 taxa_vec_Asia_Levant <- NA_Asia_Levant_clean %>%
-  distinct(taxon_clean_cap) %>% # get unique values
+  # distinct(taxon_clean_cap) %>% # get unique values
   pull(taxon_clean_cap) # extracting column, pull() makes vector / select() makes data frame
 
 # other cleaning
@@ -399,6 +304,7 @@ classification_Asia_Levant <-
     .x = .,
     .f = ~ taxospace::get_classification(.x)) %>% 
   bind_rows() 
+
 
 # my idea - not that good
 classification_Asia_Levant %>% 
@@ -428,13 +334,11 @@ classification_Asia_Levant %>%
 
 
 
-
-
 ### Asia Main ----
 
 # Make vector with clean taxon names
 taxa_vec_Asia_Main <- NA_Asia_Main_clean %>%
-  distinct(taxon_clean_cap) %>%
+  # distinct(taxon_clean_cap) %>%
   pull(taxon_clean_cap) # extracting column, pull() makes vector / select() makes data frame
 
 # Get classification for Asia Main
@@ -471,7 +375,7 @@ get_finest_classification_Asia_Main <-
 
 ### Asia Siberia ----
 taxa_vec_Asia_Siberia <- NA_Asia_Siberia_clean %>%
-  distinct(taxon_clean_cap) %>%
+ # distinct(taxon_clean_cap) %>%
   pull(taxon_clean_cap)
 
 # Get classification for Asia Siberia
@@ -508,7 +412,7 @@ get_finest_classification_Asia_Siberia <-
 
 ### Europe ----
 taxa_vec_Europe <- NA_Europe_clean %>%
-  distinct(taxon_clean_cap) %>%
+ # distinct(taxon_clean_cap) %>%
   pull(taxon_clean_cap)
 
 # Get classification for Asia Europe
@@ -549,7 +453,7 @@ get_finest_classification_Europe <-
 
 ### Indopacific ----
 taxa_vec_Indopacific <- NA_Indopacific_clean %>%
-  distinct(taxon_clean_cap) %>%
+  # distinct(taxon_clean_cap) %>%
   pull(taxon_clean_cap)
 
 # Get classification for Indopacific
@@ -591,7 +495,7 @@ get_finest_classification_Indopacific <-
 
 ### Latin America ----
 taxa_vec_Latin_America <- NA_Latin_America_clean %>%
-  distinct(taxon_clean_cap) %>%
+ # distinct(taxon_clean_cap) %>%
   pull(taxon_clean_cap)
 
 
@@ -634,7 +538,7 @@ get_finest_classification_Latin_America <-
 
 ### North America ----
 taxa_vec_North_America <- NA_North_America_clean %>%
-  distinct(taxon_clean_cap) %>%
+ # distinct(taxon_clean_cap) %>%
   pull(taxon_clean_cap)
 
 # Get classification for North America
@@ -673,112 +577,295 @@ get_finest_classification_North_America <-
 
 ## Asia Levant ----
 
-# harm table a
+### harm table a ----
 joined_empty_Birks_tables_Asia_Levant
 
-# harm table b - unlist
+### harm table b ---- 
+
+# unlist
 get_finest_classification_Asia_Levant <- get_finest_classification_Asia_Levant %>% 
   dplyr::mutate(
     level_1 = map_chr(level_1, 1)
   )
 
+# merge get_finest_classification_Asia_Levant and NA_Asia_Levant_clean to get 
+# taxon_name for future merging with Birks
 
-# joining harm a and harm b tables
-
-# add new column which will match with get finest classification tables
-taxa_reference_table_2 <- taxa_reference_table %>% 
+NA_Asia_Levant_clean <- NA_Asia_Levant_clean %>% 
   mutate(
-    sel_name = neotoma_names
-  )
+    sel_name = taxon_clean_cap) %>% 
+  select(-c(raw_name, level_1, taxon_clean, taxon_clean_cap))
 
-# 
-classification_with_taxon_names_Asia_Levant <- get_finest_classification_Asia_Levant %>%
+
+classification_with_taxon_names_Asia_Levant <- 
+  left_join(get_finest_classification_Asia_Levant, NA_Asia_Levant_clean, by = "sel_name")
+
+
+### merge classification_with_taxon_names_Asia_Levant with Birks to final table ----
+# level_1 are the harmonisation
+harmonisation_table_Asia_Levant <- joined_empty_Birks_tables_Asia_Levant %>%
   left_join(
-    taxa_reference_table_2 %>%
-      select(taxon_name, sel_name),
-    by = "sel_name"
-  )
+    classification_with_taxon_names_Asia_Levant %>%
+      select(taxon_name, level_1),
+    by = "taxon_name",
+    suffix = c("", "_new")
+  ) %>%
+  mutate(
+    level_1 = coalesce(level_1, level_1_new)
+  ) %>%
+  select(-level_1_new)
+
 
 
 ## Asia Main ----
 
-# harm table a
+### harm table a ----
 joined_empty_Birks_tables_Asia_Main
 
-# harm table b
+### harm table b ---- 
+
+# unlist
 get_finest_classification_Asia_Main <- get_finest_classification_Asia_Main %>% 
   dplyr::mutate(
     level_1 = map_chr(level_1, 1)
   )
 
+# merge get_finest_classification_Asia_Main and NA_Asia_Main_clean to get 
+# taxon_name for future merging with Birks
+
+NA_Asia_Main_clean <- NA_Asia_Main_clean %>% 
+  mutate(
+    sel_name = taxon_clean_cap) %>% 
+  select(-c(raw_name, level_1, taxon_clean, taxon_clean_cap))
+
+
+classification_with_taxon_names_Asia_Main <- 
+  left_join(get_finest_classification_Asia_Main, NA_Asia_Main_clean, by = "sel_name")
+
+
+### merge classification_with_taxon_names_Asia_Main with Birks to final table ----
+# level_1 are the harmonisation
+harmonisation_table_Asia_Main <- joined_empty_Birks_tables_Asia_Main %>%
+  left_join(
+    classification_with_taxon_names_Asia_Main %>%
+      select(taxon_name, level_1),
+    by = "taxon_name",
+    suffix = c("", "_new")
+  ) %>%
+  mutate(
+    level_1 = coalesce(level_1, level_1_new)
+  ) %>%
+  select(-level_1_new)
+
+
+
 
 ## Asia Siberia ----
 
-# harm table a
+### harm table a ----
 joined_empty_Birks_tables_Asia_Siberia
 
-# harm table b
+### harm table b ---- 
+
+# unlist
 get_finest_classification_Asia_Siberia <- get_finest_classification_Asia_Siberia %>% 
   dplyr::mutate(
     level_1 = map_chr(level_1, 1)
   )
 
+# merge get_finest_classification_Asia_Siberia and NA_Asia_Siberia_clean to get 
+# taxon_name for future merging with Birks
+
+NA_Asia_Siberia_clean <- NA_Asia_Siberia_clean %>% 
+  mutate(
+    sel_name = taxon_clean_cap) %>% 
+  select(-c(raw_name, level_1, taxon_clean, taxon_clean_cap))
+
+
+classification_with_taxon_names_Asia_Siberia <- 
+  left_join(get_finest_classification_Asia_Siberia, NA_Asia_Siberia_clean, by = "sel_name")
+
+
+### merge classification_with_taxon_names_Asia_Siberia with Birks to final table ----
+# level_1 are the harmonisation
+harmonisation_table_Asia_Siberia <- joined_empty_Birks_tables_Asia_Siberia %>%
+  left_join(
+    classification_with_taxon_names_Asia_Siberia %>%
+      select(taxon_name, level_1),
+    by = "taxon_name",
+    suffix = c("", "_new")
+  ) %>%
+  mutate(
+    level_1 = coalesce(level_1, level_1_new)
+  ) %>%
+  select(-level_1_new)
+
 
 
 ## Europe ----
 
-# harm table a
+### harm table a ----
 joined_empty_Birks_tables_Europe
 
-# harm table b
+### harm table b ---- 
+
+# unlist
 get_finest_classification_Europe <- get_finest_classification_Europe %>% 
   dplyr::mutate(
     level_1 = map_chr(level_1, 1)
   )
 
+# merge get_finest_classification_Europe and NA_Europe_clean to get 
+# taxon_name for future merging with Birks
+
+NA_Europe_clean <- NA_Europe_clean %>% 
+  mutate(
+    sel_name = taxon_clean_cap) %>% 
+  select(-c(raw_name, level_1, taxon_clean, taxon_clean_cap))
+
+
+classification_with_taxon_names_Europe <- 
+  left_join(get_finest_classification_Europe, NA_Europe_clean, by = "sel_name")
+
+
+### merge classification_with_taxon_names_Europe with Birks to final table ----
+# level_1 are the harmonisation
+harmonisation_table_Europe <- joined_empty_Birks_tables_Europe %>%
+  left_join(
+    classification_with_taxon_names_Europe %>%
+      select(taxon_name, level_1),
+    by = "taxon_name",
+    suffix = c("", "_new")
+  ) %>%
+  mutate(
+    level_1 = coalesce(level_1, level_1_new)
+  ) %>%
+  select(-level_1_new)
 
 
 ## Indopacific ----
 
-# harm table a
+### harm table a ----
 joined_empty_Birks_tables_Indopacific
 
-# harm table b
+### harm table b ---- 
+
+# unlist
 get_finest_classification_Indopacific <- get_finest_classification_Indopacific %>% 
   dplyr::mutate(
     level_1 = map_chr(level_1, 1)
   )
 
+# merge get_finest_classification_Indopacific and NA_Indopacific_clean to get 
+# taxon_name for future merging with Birks
+
+NA_Indopacific_clean <- NA_Indopacific_clean %>% 
+  mutate(
+    sel_name = taxon_clean_cap) %>% 
+  select(-c(raw_name, level_1, taxon_clean, taxon_clean_cap))
+
+
+classification_with_taxon_names_Indopacific <- 
+  left_join(get_finest_classification_Indopacific, NA_Indopacific_clean, by = "sel_name")
+
+
+### merge classification_with_taxon_names_Asia_Levant with Birks to final table ----
+# level_1 are the harmonisation
+harmonisation_table_Indopacific <- joined_empty_Birks_tables_Indospecific %>%
+  left_join(
+    classification_with_taxon_names_Indopacific %>%
+      select(taxon_name, level_1),
+    by = "taxon_name",
+    suffix = c("", "_new")
+  ) %>%
+  mutate(
+    level_1 = coalesce(level_1, level_1_new)
+  ) %>%
+  select(-level_1_new)
 
 
 
 
 ## Latin America ----
 
-# harm table a
+### harm table a ----
 joined_empty_Birks_tables_Latin_America
+### harm table b ---- 
 
-# harm table b
+# unlist
 get_finest_classification_Latin_America <- get_finest_classification_Latin_America %>% 
   dplyr::mutate(
     level_1 = map_chr(level_1, 1)
   )
 
+# merge get_finest_classification_Latin_America and NA_Latin_America_clean to get 
+# taxon_name for future merging with Birks
+
+NA_Latin_America_clean <- NA_Latin_America_clean %>% 
+  mutate(
+    sel_name = taxon_clean_cap) %>% 
+  select(-c(raw_name, level_1, taxon_clean, taxon_clean_cap))
+
+
+classification_with_taxon_names_Latin_America <- 
+  left_join(get_finest_classification_Latin_America, NA_Latin_America_clean, by = "sel_name")
+
+
+### merge classification_with_taxon_names_Latin_America with Birks to final table ----
+# level_1 are the harmonisation
+harmonisation_table_Latin_America <- joined_empty_Birks_tables_Latin_America %>%
+  left_join(
+    classification_with_taxon_names_Latin_America %>%
+      select(taxon_name, level_1),
+    by = "taxon_name",
+    suffix = c("", "_new")
+  ) %>%
+  mutate(
+    level_1 = coalesce(level_1, level_1_new)
+  ) %>%
+  select(-level_1_new)
 
 
 
 
 ## North America ----
 
-# harm table a
+### harm table a ----
 joined_empty_Birks_tables_North_America
 
-# harm table b
+### harm table b ---- 
+# unlist
 get_finest_classification_North_America <- get_finest_classification_North_America %>% 
   dplyr::mutate(
     level_1 = map_chr(level_1, 1)
   )
 
+# merge get_finest_classification_North_America and NA_North_America_clean to get 
+# taxon_name for future merging with Birks
+
+NA_North_America_clean <- NA_North_America_clean %>% 
+  mutate(
+    sel_name = taxon_clean_cap) %>% 
+  select(-c(raw_name, level_1, taxon_clean, taxon_clean_cap))
+
+
+classification_with_taxon_names_North_America <- 
+  left_join(get_finest_classification_North_America, NA_North_America_clean, by = "sel_name")
+
+
+### merge classification_with_taxon_names_North_America with Birks to final table ----
+# level_1 are the harmonisation
+harmonisation_table_North_America <- joined_empty_Birks_tables_North_America %>%
+  left_join(
+    classification_with_taxon_names_North_America %>%
+      select(taxon_name, level_1),
+    by = "taxon_name",
+    suffix = c("", "_new")
+  ) %>%
+  mutate(
+    level_1 = coalesce(level_1, level_1_new)
+  ) %>%
+  select(-level_1_new)
 
 
 
