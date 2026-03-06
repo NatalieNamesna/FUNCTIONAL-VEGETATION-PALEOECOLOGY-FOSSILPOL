@@ -37,3 +37,23 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+
+# large files
+
+# models
+Data/Processed/Chronology/Models_full/
+
+# predicted ages
+Data/Processed/Chronology/Predicted_ages/
+
+# Neotoma chron control
+Data/Processed/Neotoma_processed/Neotoma_chron_control/
+
+# Harmonised data
+Data/Processed/Data_harmonised/
+
+# data with chronologies
+Data/Processed/Data_with_chronologies/
+
+# figures
+Outputs/Figures/
