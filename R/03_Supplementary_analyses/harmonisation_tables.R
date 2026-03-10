@@ -826,8 +826,6 @@ harmonisation_table_Latin_America <- joined_empty_Birks_tables_Latin_America %>%
   select(-level_1_new)
 
 
-
-
 ## North America ----
 
 ### harm table a ----
