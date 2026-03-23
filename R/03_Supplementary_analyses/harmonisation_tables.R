@@ -292,8 +292,8 @@ taxa_vec_Asia_Levant <- NA_Asia_Levant_clean %>%
   pull(taxon_clean_cap) # extracting column, pull() makes vector / select() makes data frame
 
 # other cleaning
-taxa_vec_Asia_Levant_clean <- taxa_vec_Asia_Levant %>%
-  str_replace(" [A-Z].*$", "")
+# taxa_vec_Asia_Levant_clean <- taxa_vec_Asia_Levant %>%
+#  str_replace(" [A-Z].*$", "")
 
 # Get classification for Asia Levant
 classification_Asia_Levant <-
@@ -867,14 +867,55 @@ harmonisation_table_North_America <- joined_empty_Birks_tables_North_America %>%
 
 
 
+#------------------------------------------------------------------------------#
+# 8. Putting together all harm tables -----
+#------------------------------------------------------------------------------#
+
+harmonisation_tables <- list(
+  Asia_Levant = harmonisation_table_Asia_Levant,
+  Asia_Main = harmonisation_table_Asia_Main,
+  Asia_Siberia = harmonisation_table_Asia_Siberia,
+  Europe = harmonisation_table_Europe,
+  IndoPacific = harmonisation_table_Indopacific,
+  Latin_America = harmonisation_table_Latin_America,
+  North_America = harmonisation_table_North_America
+)
 
 
+harmonisation_tables_df <- tibble(
+  harmonisation_region = names(harmonisation_tables),
+  harm_table = harmonisation_tables
+)
 
 
+#----------------------------------------------------------#
+# 9. Harmonise data -----
+#----------------------------------------------------------#
+
+data_harmonised <-
+  RFossilpol::harmonise_all_regions(
+    data_source = data_with_chronologies,
+    harmonisation_tables = harmonisation_tables_df,
+    original_name = "taxon_name",
+    harm_level = "level_1", # [USER] Change the levels if needed
+    exclude_taxa = "delete",
+    pollen_grain_test = TRUE # [USER] Turn FALSE to hide progress
+  )
 
 
+#----------------------------------------------------------#
+# 10. Save the data  -----
+#----------------------------------------------------------#
 
-
+RUtilpol::save_latest_file(
+  object_to_save = data_harmonised,
+  dir = paste0(
+    data_storage_path, # [config_criteria]
+    "/Data/Processed/Data_harmonised"
+  ),
+  prefered_format = "rds",
+  use_sha = TRUE
+)
 
 
 
