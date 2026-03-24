@@ -77,6 +77,9 @@ empty_Latin_America <- read_csv("Data/Input/Harmonisation_tables/Latin_America_2
 empty_North_America <- read_csv("Data/Input/Harmonisation_tables/North_America_2026-02-24.csv")%>% 
   dplyr::select(-level_1)
 
+empty_Africa <- read_csv("Data/Input/Harmonisation_tables/Africa_2026-02-24.csv") %>% 
+  dplyr::select(-level_1)
+
 taxa_reference_table <- readr::read_csv(
   here::here("Data/Input/Harmonisation_tables/taxa_reference_table_2026-02-27.csv")
 )
@@ -160,6 +163,20 @@ remotes::install_github("OndrejMottl/taxospace")
 library(taxospace)
 
 ## Clean taxon names ----
+
+### Africa ----
+NA_Africa_clean <- empty_Africa %>% 
+  mutate(
+    taxon_clean = taxon_name %>% 
+      str_replace_all("_", " ")) %>%
+      mutate(
+        taxon_clean_cap = str_c(
+          str_to_upper(str_sub(taxon_clean, 1, 1)),
+          str_sub(taxon_clean, 2)
+        )
+      )
+    
+
 
 ### Asia Levant ----
 NA_Asia_Levant_clean <- NA_Asia_Levant %>% 
@@ -283,6 +300,48 @@ NA_North_America_clean <- NA_North_America %>%
 
 
 ## Using {taxospace} for completing missing classification ----
+
+### Africa ----
+# Make vector with clean taxon names
+taxa_vec_Africa <- NA_Africa_clean %>%
+  # distinct(taxon_clean_cap) %>% # get unique values
+  pull(taxon_clean_cap)
+
+# Get classification for Africa
+classification_Africa <-
+  taxa_vec_Africa %>% 
+  rlang::set_names() %>% 
+  purrr::map(
+    .progress = TRUE,
+    .x = .,
+    .f = ~ taxospace::get_classification(.x)) %>% 
+  bind_rows() 
+
+# get table of finest classification -> Ondra's idea - very good
+get_finest_classification_Africa <-
+  classification_Africa %>% 
+  dplyr::select(sel_name, classification) %>% 
+  tidyr::unnest(classification) %>% 
+  dplyr::select(-id) %>%
+  pivot_wider(
+    names_from = rank, 
+    values_from = name
+  ) %>% 
+  dplyr::mutate(
+    level_1a = dplyr::case_when(
+      genus == "NULL" ~  family,
+      .default = genus
+    )
+  ) %>% 
+  dplyr::mutate(
+    level_1 = dplyr::if_else(
+      level_1a == "NULL", class, level_1a
+    )
+  ) %>%
+  dplyr::select(sel_name, level_1)
+
+
+
 
 ### Asia Levant ----
 
@@ -866,12 +925,35 @@ harmonisation_table_North_America <- joined_empty_Birks_tables_North_America %>%
   select(-level_1_new)
 
 
+## Africa ----
+# unlist
+get_finest_classification_Africa <- get_finest_classification_Africa %>% 
+  dplyr::mutate(
+    level_1 = map_chr(level_1, 1)
+  )
+
+# merge get_finest_classification_Africa and NA_Africa_clean to get 
+# taxon_name 
+
+NA_Africa_clean <- NA_Africa_clean %>% 
+  mutate(
+    sel_name = taxon_clean_cap) %>% 
+  select(-c( taxon_clean, taxon_clean_cap))
+
+
+harmonisation_table_Africa <- 
+  left_join(get_finest_classification_Africa, NA_Africa_clean, by = "sel_name")
+
+
+
+
 
 #------------------------------------------------------------------------------#
 # 8. Putting together all harm tables -----
 #------------------------------------------------------------------------------#
 
 harmonisation_tables <- list(
+  Africa = harmonisation_table_Africa,
   Asia_Levant = harmonisation_table_Asia_Levant,
   Asia_Main = harmonisation_table_Asia_Main,
   Asia_Siberia = harmonisation_table_Asia_Siberia,
@@ -889,11 +971,25 @@ harmonisation_tables_df <- tibble(
 
 
 #----------------------------------------------------------#
-# 9. Save the data -----
+# 9. Harmonise data -----
+#----------------------------------------------------------#
+data_harmonised <-
+  RFossilpol::harmonise_all_regions(
+    data_source = data_with_chronologies,
+    harmonisation_tables = harmonisation_tables_df,
+    original_name = "taxon_name",
+    harm_level = "level_1", # [USER] Change the levels if needed
+    exclude_taxa = "delete",
+    pollen_grain_test = TRUE # [USER] Turn FALSE to hide progress
+  )
+
+
+#----------------------------------------------------------#
+# 10. Save the data -----
 #----------------------------------------------------------#
 
 RUtilpol::save_latest_file(
-  object_to_save = harmonisation_tables_df,
+  object_to_save = data_harmonised,
   dir = paste0(
     data_storage_path, # [config_criteria]
     "/Data/Processed/Data_harmonised"
