@@ -889,26 +889,11 @@ harmonisation_tables_df <- tibble(
 
 
 #----------------------------------------------------------#
-# 9. Harmonise data -----
-#----------------------------------------------------------#
-
-data_harmonised <-
-  RFossilpol::harmonise_all_regions(
-    data_source = data_with_chronologies,
-    harmonisation_tables = harmonisation_tables_df,
-    original_name = "taxon_name",
-    harm_level = "level_1", # [USER] Change the levels if needed
-    exclude_taxa = "delete",
-    pollen_grain_test = TRUE # [USER] Turn FALSE to hide progress
-  )
-
-
-#----------------------------------------------------------#
-# 10. Save the data  -----
+# 9. Save the data -----
 #----------------------------------------------------------#
 
 RUtilpol::save_latest_file(
-  object_to_save = data_harmonised,
+  object_to_save = harmonisation_tables_df,
   dir = paste0(
     data_storage_path, # [config_criteria]
     "/Data/Processed/Data_harmonised"
@@ -916,6 +901,7 @@ RUtilpol::save_latest_file(
   prefered_format = "rds",
   use_sha = TRUE
 )
+
 
 
 
