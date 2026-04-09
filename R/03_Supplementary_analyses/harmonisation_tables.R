@@ -314,15 +314,51 @@ classification_Africa <-
   purrr::map(
     .progress = TRUE,
     .x = .,
-    .f = ~ taxospace::get_classification(.x)) %>% 
+    .f = ~ {
+      
+      classification_test <-
+        taxospace::get_classification(.x)
+      
+      if () {
+        
+      }
+         
+      
+      res <- 
+        
+      
+      return(res)
+      
+    }) %>%  # 
+  purrr::compact() %>% 
   bind_rows() 
 
 # get table of finest classification -> Ondra's idea - very good
 get_finest_classification_Africa <-
   classification_Africa %>% 
   dplyr::select(sel_name, classification) %>% 
-  tidyr::unnest(classification) %>% 
+  dplyr::mutate(
+    is_classification_null = purrr::map_lgl(
+      .x = classification,
+      .f = ~ all(is.null(.x))
+    ),
+    classification_no_null = purrr::map2(
+      .x = is_classification_null,
+      .y = classification,
+      .f = ~ {
+        if (isTRUE(.x)) {
+          return(tibble(
+            name = NA_character_,
+            rank = NA_character_
+          ))
+        }
+        return(.y)
+      }
+    )) %>% 
+  dplyr::select(sel_name, classification_no_null) %>% 
+  tidyr::unnest(classification_no_null) %>% 
   dplyr::select(-id) %>%
+  dplyr::distinct() %>% 
   pivot_wider(
     names_from = rank, 
     values_from = name
