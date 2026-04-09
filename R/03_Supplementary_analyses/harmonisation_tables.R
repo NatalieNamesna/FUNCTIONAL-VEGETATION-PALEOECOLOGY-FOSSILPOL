@@ -314,24 +314,43 @@ classification_Africa <-
   purrr::map(
     .progress = TRUE,
     .x = .,
-    .f = ~ {
-      
-      classification_test <-
-        taxospace::get_classification(.x)
-      
-      if () {
-        
-      }
-         
-      
-      res <- 
-        
-      
-      return(res)
-      
-    }) %>%  # 
+    .f = ~ taxospace::get_classification(.x)) %>% 
   purrr::compact() %>% 
   bind_rows() 
+  
+# adding column kingdom to know which species are actually plants
+classification_Africa_only_plants <- classification_Africa %>% 
+  dplyr::mutate(kingdom = map_chr(classification, ~ {
+    if (is.null(.x)) {
+      NA_character_
+    } else {
+      .x$name[1]
+    }
+  })) %>%
+  dplyr::filter(kingdom == c("Plantae"))
+
+# get table of finest classification
+get_finest_classification_Africa_Naty <-
+  classification_Africa_only_plants %>%
+  dplyr::select(sel_name, classification) %>% 
+  tidyr::unnest(classification) %>% 
+  dplyr::select(-id) %>%
+  pivot_wider(
+    names_from = rank, 
+    values_from = name
+  ) %>% 
+  dplyr::mutate(
+    level_1a = dplyr::case_when(
+      genus == "NULL" ~  family,
+      .default = genus
+    )
+  ) %>% 
+  dplyr::mutate(
+    level_1 = dplyr::if_else(
+      level_1a == "NULL", class, level_1a
+    )
+  ) %>%
+  dplyr::select(sel_name, level_1)
 
 # get table of finest classification -> Ondra's idea - very good
 get_finest_classification_Africa <-
