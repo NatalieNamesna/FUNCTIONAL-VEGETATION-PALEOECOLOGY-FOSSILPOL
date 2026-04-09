@@ -329,7 +329,7 @@ classification_Africa_only_plants <- classification_Africa %>%
   })) %>%
   dplyr::filter(kingdom == c("Plantae"))
 
-# get table of finest classification
+# get table of finest classification option 1
 get_finest_classification_Africa_Naty <-
   classification_Africa_only_plants %>%
   dplyr::select(sel_name, classification) %>% 
@@ -352,7 +352,7 @@ get_finest_classification_Africa_Naty <-
   ) %>%
   dplyr::select(sel_name, level_1)
 
-# get table of finest classification -> Ondra's idea - very good
+# get table of finest classification option 2
 get_finest_classification_Africa <-
   classification_Africa %>% 
   dplyr::select(sel_name, classification) %>% 
@@ -420,17 +420,20 @@ classification_Asia_Levant <-
   bind_rows() 
 
 
-# my idea - not that good
-classification_Asia_Levant %>% 
-  dplyr::select(sel_name, classification) %>% 
-  tidyr::unnest(classification) %>% 
-  dplyr::select(-id) %>%
-  group_by(sel_name) %>% 
-  slice_tail(n = 1) 
+# adding column kingdom to know which species are actually plants
+classification_Asia_Levant_only_plants <- classification_Asia_Levant %>% 
+  dplyr::mutate(kingdom = map_chr(classification, ~ {
+    if (is.null(.x)) {
+      NA_character_
+    } else {
+      .x$name[1]
+    }
+  })) %>%
+  dplyr::filter(kingdom == c("Plantae"))
 
-# get table of finest classification -> Ondra's idea - very good
+# get table of finest classification 
 get_finest_classification_Asia_Levant <-
-classification_Asia_Levant %>% 
+classification_Asia_Levant_only_plants %>% 
   dplyr::select(sel_name, classification) %>% 
   tidyr::unnest(classification) %>% 
   dplyr::select(-id) %>%
@@ -465,9 +468,20 @@ classification_Asia_Main <-
     .f = ~ taxospace::get_classification(.x)) %>% 
   bind_rows() 
 
+# adding column kingdom to know which species are actually plants
+classification_Asia_Main_only_plants <- classification_Asia_Main %>% 
+  dplyr::mutate(kingdom = map_chr(classification, ~ {
+    if (is.null(.x)) {
+      NA_character_
+    } else {
+      .x$name[1]
+    }
+  })) %>%
+  dplyr::filter(kingdom == c("Plantae"))
+
 # get table of finest classification
 get_finest_classification_Asia_Main <-
-  classification_Asia_Main %>% 
+  classification_Asia_Main_only_plants %>% 
   dplyr::select(sel_name, classification) %>% 
   tidyr::unnest(classification) %>% 
   dplyr::select(-id) %>%
@@ -502,9 +516,20 @@ classification_Asia_Siberia <-
     .f = ~ taxospace::get_classification(.x)) %>% 
   bind_rows() 
 
+# adding column kingdom to know which species are actually plants
+classification_Asia_Siberia_only_plants <- classification_Asia_Siberia %>% 
+  dplyr::mutate(kingdom = map_chr(classification, ~ {
+    if (is.null(.x)) {
+      NA_character_
+    } else {
+      .x$name[1]
+    }
+  })) %>%
+  dplyr::filter(kingdom == c("Plantae"))
+
 # get table of finest classification
 get_finest_classification_Asia_Siberia <-
-  classification_Asia_Siberia %>% 
+  classification_Asia_Siberia_only_plants %>% 
   dplyr::select(sel_name, classification) %>% 
   tidyr::unnest(classification) %>% 
   dplyr::select(-id) %>%
@@ -519,8 +544,6 @@ get_finest_classification_Asia_Siberia <-
     )
   ) %>% 
   dplyr::select(sel_name, level_1)
-
-
 
 
 
@@ -539,9 +562,20 @@ classification_Europe <-
     .f = ~ taxospace::get_classification(.x)) %>% 
   bind_rows() 
 
+# adding column kingdom to know which species are actually plants
+classification_Europe_only_plants <- classification_Europe %>% 
+  dplyr::mutate(kingdom = map_chr(classification, ~ {
+    if (is.null(.x)) {
+      NA_character_
+    } else {
+      .x$name[1]
+    }
+  })) %>%
+  dplyr::filter(kingdom == c("Plantae"))
+
 # get table of finest classification
 get_finest_classification_Europe <-
-  classification_Europe %>% 
+  classification_Europe_only_plants %>% 
   dplyr::select(sel_name, classification) %>% 
   tidyr::unnest(classification) %>% 
   dplyr::select(-id) %>%
@@ -580,9 +614,20 @@ classification_Indopacific <-
     .f = ~ taxospace::get_classification(.x)) %>% 
   bind_rows() 
 
+# adding column kingdom to know which species are actually plants
+classification_Indopacific_only_plants <- classification_Indopacific %>% 
+  dplyr::mutate(kingdom = map_chr(classification, ~ {
+    if (is.null(.x)) {
+      NA_character_
+    } else {
+      .x$name[1]
+    }
+  })) %>%
+  dplyr::filter(kingdom == c("Plantae"))
+
 # get table of finest classification
 get_finest_classification_Indopacific <-
-  classification_Indopacific %>% 
+  classification_Indopacific_only_plants %>% 
   dplyr::select(sel_name, classification) %>% 
   tidyr::unnest(classification) %>% 
   dplyr::select(-id) %>%
@@ -605,8 +650,6 @@ get_finest_classification_Indopacific <-
 
 
 
-
-
 ### Latin America ----
 taxa_vec_Latin_America <- NA_Latin_America_clean %>%
  # distinct(taxon_clean_cap) %>%
@@ -623,9 +666,20 @@ classification_Latin_America <-
     .f = ~ taxospace::get_classification(.x)) %>% 
   bind_rows() 
 
+# adding column kingdom to know which species are actually plants
+classification_Latin_America_only_plants <- classification_Latin_America %>% 
+  dplyr::mutate(kingdom = map_chr(classification, ~ {
+    if (is.null(.x)) {
+      NA_character_
+    } else {
+      .x$name[1]
+    }
+  })) %>%
+  dplyr::filter(kingdom == c("Plantae"))
+
 # get table of finest classification
 get_finest_classification_Latin_America <-
-  classification_Latin_America %>% 
+  classification_Latin_America_only_plants %>% 
   dplyr::select(sel_name, classification) %>% 
   tidyr::unnest(classification) %>% 
   dplyr::select(-id) %>%
@@ -648,8 +702,6 @@ get_finest_classification_Latin_America <-
 
 
 
-
-
 ### North America ----
 taxa_vec_North_America <- NA_North_America_clean %>%
  # distinct(taxon_clean_cap) %>%
@@ -665,10 +717,20 @@ classification_North_America <-
     .f = ~ taxospace::get_classification(.x)) %>% 
   bind_rows() 
 
+# adding column kingdom to know which species are actually plants
+classification_North_America_only_plants <- classification_North_America %>% 
+  dplyr::mutate(kingdom = map_chr(classification, ~ {
+    if (is.null(.x)) {
+      NA_character_
+    } else {
+      .x$name[1]
+    }
+  })) %>%
+  dplyr::filter(kingdom == c("Plantae"))
 
 # get table of finest classification
 get_finest_classification_North_America <-
-  classification_North_America %>% 
+  classification_North_America_only_plants %>% 
   dplyr::select(sel_name, classification) %>% 
   tidyr::unnest(classification) %>% 
   dplyr::select(-id) %>%
@@ -982,7 +1044,7 @@ harmonisation_table_North_America <- joined_empty_Birks_tables_North_America %>%
 
 ## Africa ----
 # unlist
-get_finest_classification_Africa <- get_finest_classification_Africa %>% 
+get_finest_classification_Africa_Naty <- get_finest_classification_Africa_Naty %>% 
   dplyr::mutate(
     level_1 = map_chr(level_1, 1)
   )
@@ -997,7 +1059,7 @@ NA_Africa_clean <- NA_Africa_clean %>%
 
 
 harmonisation_table_Africa <- 
-  left_join(get_finest_classification_Africa, NA_Africa_clean, by = "sel_name")
+  left_join(get_finest_classification_Africa_Naty, NA_Africa_clean, by = "sel_name")
 
 
 
