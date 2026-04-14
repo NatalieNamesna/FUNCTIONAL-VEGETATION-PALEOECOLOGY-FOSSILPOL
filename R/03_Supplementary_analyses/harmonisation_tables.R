@@ -314,7 +314,7 @@ classification_Africa <-
   purrr::map(
     .progress = TRUE,
     .x = .,
-    .f = ~ taxospace::get_classification(.x)) %>% 
+    .f = ~ taxospace::get_classification(.x, use_only_exact_match = FALSE)) %>% 
   purrr::compact() %>% 
   bind_rows() 
   
@@ -326,76 +326,60 @@ classification_Africa_only_plants <- classification_Africa %>%
     } else {
       .x$name[1]
     }
-  })) %>%
-  dplyr::filter(kingdom == c("Plantae"))
+  })) 
 
 # get table of finest classification option 1
-get_finest_classification_Africa_Naty <-
+get_finest_classification_Africa_option_1 <-
   classification_Africa_only_plants %>%
-  dplyr::select(sel_name, classification) %>% 
+  dplyr::select(sel_name, classification, kingdom) %>% 
   tidyr::unnest(classification) %>% 
   dplyr::select(-id) %>%
+  distinct(sel_name, rank, kingdom, .keep_all = TRUE) %>% 
+  # pivot_wider(
+  #  names_from = kingdom, 
+  # values_from = name
+  # ) %>% 
+  #  dplyr::mutate(
+  #   level_1 = dplyr::case_when(
+  #      .default = Plantae,
+  #     is.na(Plantae) ~ "delete"
+  #  )
+  # ) %>% 
+  dplyr::mutate(
+    delete = dplyr::if_else(
+      kingdom != "Plantae", "delete", kingdom
+    )
+  ) %>%
+  dplyr::select(-kingdom) %>% 
   pivot_wider(
-    names_from = rank, 
+    names_from = rank,
     values_from = name
   ) %>% 
+  
+ # dplyr::select(sel_name, rank, level_1) %>% 
+ #  pivot_wider(
+ #   names_from = rank, 
+ #  values_from = level_1
+ # ) %>% 
   dplyr::mutate(
     level_1a = dplyr::case_when(
-      genus == "NULL" ~  family,
+      is.na(genus) ~  family,
       .default = genus
     )
   ) %>% 
+  
   dplyr::mutate(
-    level_1 = dplyr::if_else(
-      level_1a == "NULL", class, level_1a
+    level_1b = dplyr::if_else(
+      is.na(level_1a), class, level_1a
     )
   ) %>%
-  dplyr::select(sel_name, level_1)
-
-# get table of finest classification option 2
-get_finest_classification_Africa <-
-  classification_Africa %>% 
-  dplyr::select(sel_name, classification) %>% 
+  dplyr::select(sel_name, level_1b, delete) %>% 
+  
   dplyr::mutate(
-    is_classification_null = purrr::map_lgl(
-      .x = classification,
-      .f = ~ all(is.null(.x))
-    ),
-    classification_no_null = purrr::map2(
-      .x = is_classification_null,
-      .y = classification,
-      .f = ~ {
-        if (isTRUE(.x)) {
-          return(tibble(
-            name = NA_character_,
-            rank = NA_character_
-          ))
-        }
-        return(.y)
-      }
+    level_1 = dplyr::if_else(
+      delete == "Plantae", level_1b, "delete"
     )) %>% 
-  dplyr::select(sel_name, classification_no_null) %>% 
-  tidyr::unnest(classification_no_null) %>% 
-  dplyr::select(-id) %>%
-  dplyr::distinct() %>% 
-  pivot_wider(
-    names_from = rank, 
-    values_from = name
-  ) %>% 
-  dplyr::mutate(
-    level_1a = dplyr::case_when(
-      genus == "NULL" ~  family,
-      .default = genus
-    )
-  ) %>% 
-  dplyr::mutate(
-    level_1 = dplyr::if_else(
-      level_1a == "NULL", class, level_1a
-    )
-  ) %>%
-  dplyr::select(sel_name, level_1)
-
-
+    dplyr::select(-c(level_1b, delete))
 
 
 ### Asia Levant ----
@@ -416,7 +400,7 @@ classification_Asia_Levant <-
   purrr::map(
     .progress = TRUE,
     .x = .,
-    .f = ~ taxospace::get_classification(.x)) %>% 
+    .f = ~ taxospace::get_classification(.x, use_only_exact_match = FALSE)) %>% 
   bind_rows() 
 
 
@@ -663,7 +647,7 @@ classification_Latin_America <-
   purrr::map(
     .progress = TRUE,
     .x = .,
-    .f = ~ taxospace::get_classification(.x)) %>% 
+    .f = ~ taxospace::get_classification(.x, use_only_exact_match = FALSE)) %>% 
   bind_rows() 
 
 # adding column kingdom to know which species are actually plants
@@ -714,7 +698,7 @@ classification_North_America <-
   purrr::map(
     .progress = TRUE,
     .x = .,
-    .f = ~ taxospace::get_classification(.x)) %>% 
+    .f = ~ taxospace::get_classification(.x, use_only_exact_match = FALSE)) %>% 
   bind_rows() 
 
 # adding column kingdom to know which species are actually plants
@@ -1046,7 +1030,7 @@ harmonisation_table_North_America <- joined_empty_Birks_tables_North_America %>%
 # unlist
 get_finest_classification_Africa_Naty <- get_finest_classification_Africa_Naty %>% 
   dplyr::mutate(
-    level_1 = map_chr(level_1, 1)
+    level_1 = as.character(level_1)
   )
 
 # merge get_finest_classification_Africa and NA_Africa_clean to get 
