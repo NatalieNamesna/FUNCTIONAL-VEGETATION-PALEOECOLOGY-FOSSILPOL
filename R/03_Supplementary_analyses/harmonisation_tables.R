@@ -400,7 +400,8 @@ classification_Asia_Levant <-
   purrr::map(
     .progress = TRUE,
     .x = .,
-    .f = ~ taxospace::get_classification(.x, use_only_exact_match = FALSE)) %>% 
+    .f = ~ taxospace::get_classification(.x, use_only_exact_match = FALSE)) %>%
+  purrr::compact() %>% 
   bind_rows() 
 
 
@@ -412,26 +413,46 @@ classification_Asia_Levant_only_plants <- classification_Asia_Levant %>%
     } else {
       .x$name[1]
     }
-  })) %>%
-  dplyr::filter(kingdom == c("Plantae"))
+  }))
 
-# get table of finest classification 
-get_finest_classification_Asia_Levant <-
+# get table of finest classification - option 1
+get_finest_classification_Asia_Levant_option_1 <-
 classification_Asia_Levant_only_plants %>% 
-  dplyr::select(sel_name, classification) %>% 
+  dplyr::select(sel_name, classification, kingdom) %>% 
   tidyr::unnest(classification) %>% 
   dplyr::select(-id) %>%
+  distinct(sel_name, rank, kingdom, .keep_all = TRUE) %>% 
+  dplyr::mutate(
+    delete = dplyr::if_else(
+      kingdom != "Plantae", "delete", kingdom
+    )
+  ) %>%
+  dplyr::select(-kingdom) %>% 
   pivot_wider(
-    names_from = rank, 
+    names_from = rank,
     values_from = name
   ) %>% 
+  
   dplyr::mutate(
-    level_1 = dplyr::case_when(
-      genus == "NULL" ~  family,
+    level_1a = dplyr::case_when(
+      is.na(genus) ~  family,
       .default = genus
     )
   ) %>% 
-  dplyr::select(sel_name, level_1)
+  
+  dplyr::mutate(
+    level_1b = dplyr::if_else(
+      is.na(level_1a), class, level_1a
+    )
+  ) %>%
+  dplyr::select(sel_name, level_1b, delete) %>% 
+  
+  dplyr::mutate(
+    level_1 = dplyr::if_else(
+      delete == "Plantae", level_1b, "delete"
+    )) %>% 
+  dplyr::select(-c(level_1b, delete))
+  
 
 
 
@@ -449,7 +470,8 @@ classification_Asia_Main <-
   purrr::map(
     .progress = TRUE,
     .x = .,
-    .f = ~ taxospace::get_classification(.x)) %>% 
+    .f = ~ taxospace::get_classification(.x, use_only_exact_match = FALSE)) %>%
+  purrr::compact() %>% 
   bind_rows() 
 
 # adding column kingdom to know which species are actually plants
@@ -460,26 +482,46 @@ classification_Asia_Main_only_plants <- classification_Asia_Main %>%
     } else {
       .x$name[1]
     }
-  })) %>%
-  dplyr::filter(kingdom == c("Plantae"))
+  }))
 
 # get table of finest classification
-get_finest_classification_Asia_Main <-
+get_finest_classification_Asia_Main_option_1 <-
   classification_Asia_Main_only_plants %>% 
-  dplyr::select(sel_name, classification) %>% 
+  dplyr::select(sel_name, classification, kingdom) %>% 
   tidyr::unnest(classification) %>% 
   dplyr::select(-id) %>%
+  distinct(sel_name, rank, kingdom, .keep_all = TRUE) %>% 
+  dplyr::mutate(
+    delete = dplyr::if_else(
+      kingdom != "Plantae", "delete", kingdom
+    )
+  ) %>%
+  dplyr::select(-kingdom) %>% 
   pivot_wider(
-    names_from = rank, 
+    names_from = rank,
     values_from = name
   ) %>% 
+  
   dplyr::mutate(
-    level_1 = dplyr::case_when(
+    level_1a = dplyr::case_when(
       is.na(genus) ~  family,
       .default = genus
     )
   ) %>% 
-  dplyr::select(sel_name, level_1)
+  
+  dplyr::mutate(
+    level_1b = dplyr::if_else(
+      is.na(level_1a), class, level_1a
+    )
+  ) %>%
+  dplyr::select(sel_name, level_1b, delete) %>% 
+  
+  dplyr::mutate(
+    level_1 = dplyr::if_else(
+      delete == "Plantae", level_1b, "delete"
+    )) %>% 
+  dplyr::select(-c(level_1b, delete))
+
 
 
 
@@ -497,7 +539,8 @@ classification_Asia_Siberia <-
   purrr::map(
     .progress = TRUE,
     .x = .,
-    .f = ~ taxospace::get_classification(.x)) %>% 
+    .f = ~ taxospace::get_classification(.x, use_only_exact_match = FALSE)) %>% 
+  purrr::compact() %>% 
   bind_rows() 
 
 # adding column kingdom to know which species are actually plants
@@ -508,26 +551,46 @@ classification_Asia_Siberia_only_plants <- classification_Asia_Siberia %>%
     } else {
       .x$name[1]
     }
-  })) %>%
-  dplyr::filter(kingdom == c("Plantae"))
+  })) 
 
 # get table of finest classification
-get_finest_classification_Asia_Siberia <-
+get_finest_classification_Asia_Siberia_option_1 <-
   classification_Asia_Siberia_only_plants %>% 
-  dplyr::select(sel_name, classification) %>% 
+  dplyr::select(sel_name, classification, kingdom) %>% 
   tidyr::unnest(classification) %>% 
   dplyr::select(-id) %>%
+  distinct(sel_name, rank, kingdom, .keep_all = TRUE) %>% 
+  dplyr::mutate(
+    delete = dplyr::if_else(
+      kingdom != "Plantae", "delete", kingdom
+    )
+  ) %>%
+  dplyr::select(-kingdom) %>% 
   pivot_wider(
-    names_from = rank, 
+    names_from = rank,
     values_from = name
   ) %>% 
+  
   dplyr::mutate(
-    level_1 = dplyr::case_when(
-      genus == "NULL" ~  family,
+    level_1a = dplyr::case_when(
+      is.na(genus) ~  family,
       .default = genus
     )
   ) %>% 
-  dplyr::select(sel_name, level_1)
+  
+  dplyr::mutate(
+    level_1b = dplyr::if_else(
+      is.na(level_1a), class, level_1a
+    )
+  ) %>%
+  dplyr::select(sel_name, level_1b, delete) %>% 
+  
+  dplyr::mutate(
+    level_1 = dplyr::if_else(
+      delete == "Plantae", level_1b, "delete"
+    )) %>% 
+  dplyr::select(-c(level_1b, delete))
+
 
 
 
@@ -536,14 +599,15 @@ taxa_vec_Europe <- NA_Europe_clean %>%
  # distinct(taxon_clean_cap) %>%
   pull(taxon_clean_cap)
 
-# Get classification for Asia Europe
+# Get classification for Europe
 classification_Europe <-
   taxa_vec_Europe %>% 
   rlang::set_names() %>% 
   purrr::map(
     .progress = TRUE,
     .x = .,
-    .f = ~ taxospace::get_classification(.x)) %>% 
+    .f = ~ taxospace::get_classification(.x, use_only_exact_match = FALSE)) %>% 
+  purrr::compact() %>% 
   bind_rows() 
 
 # adding column kingdom to know which species are actually plants
@@ -554,31 +618,46 @@ classification_Europe_only_plants <- classification_Europe %>%
     } else {
       .x$name[1]
     }
-  })) %>%
-  dplyr::filter(kingdom == c("Plantae"))
+  })) 
 
 # get table of finest classification
-get_finest_classification_Europe <-
+get_finest_classification_Europe_option_1 <-
   classification_Europe_only_plants %>% 
-  dplyr::select(sel_name, classification) %>% 
+  dplyr::select(sel_name, classification, kingdom) %>% 
   tidyr::unnest(classification) %>% 
   dplyr::select(-id) %>%
+  distinct(sel_name, rank, kingdom, .keep_all = TRUE) %>% 
+  dplyr::mutate(
+    delete = dplyr::if_else(
+      kingdom != "Plantae", "delete", kingdom
+    )
+  ) %>%
+  dplyr::select(-kingdom) %>% 
   pivot_wider(
-    names_from = rank, 
+    names_from = rank,
     values_from = name
   ) %>% 
+  
   dplyr::mutate(
     level_1a = dplyr::case_when(
-      genus == "NULL" ~  family,
+      is.na(genus) ~  family,
       .default = genus
     )
   ) %>% 
+  
   dplyr::mutate(
-    level_1 = dplyr::if_else(
-      level_1a == "NULL", class, level_1a
+    level_1b = dplyr::if_else(
+      is.na(level_1a), class, level_1a
     )
   ) %>%
-  dplyr::select(sel_name, level_1)
+  dplyr::select(sel_name, level_1b, delete) %>% 
+  
+  dplyr::mutate(
+    level_1 = dplyr::if_else(
+      delete == "Plantae", level_1b, "delete"
+    )) %>% 
+  dplyr::select(-c(level_1b, delete))
+
 
 
 
@@ -595,7 +674,8 @@ classification_Indopacific <-
   purrr::map(
     .progress = TRUE,
     .x = .,
-    .f = ~ taxospace::get_classification(.x)) %>% 
+    .f = ~ taxospace::get_classification(.x, use_only_exact_match = FALSE)) %>% 
+  purrr::compact() %>% 
   bind_rows() 
 
 # adding column kingdom to know which species are actually plants
@@ -606,31 +686,45 @@ classification_Indopacific_only_plants <- classification_Indopacific %>%
     } else {
       .x$name[1]
     }
-  })) %>%
-  dplyr::filter(kingdom == c("Plantae"))
+  })) 
 
 # get table of finest classification
-get_finest_classification_Indopacific <-
+get_finest_classification_Indopacific_option_1 <-
   classification_Indopacific_only_plants %>% 
-  dplyr::select(sel_name, classification) %>% 
+  dplyr::select(sel_name, classification, kingdom) %>% 
   tidyr::unnest(classification) %>% 
   dplyr::select(-id) %>%
+  distinct(sel_name, rank, kingdom, .keep_all = TRUE) %>% 
+  dplyr::mutate(
+    delete = dplyr::if_else(
+      kingdom != "Plantae", "delete", kingdom
+    )
+  ) %>%
+  dplyr::select(-kingdom) %>% 
   pivot_wider(
-    names_from = rank, 
+    names_from = rank,
     values_from = name
   ) %>% 
+  
   dplyr::mutate(
     level_1a = dplyr::case_when(
-      genus == "NULL" ~  family,
+      is.na(genus) ~  family,
       .default = genus
     )
   ) %>% 
+  
   dplyr::mutate(
-    level_1 = dplyr::if_else(
-      level_1a == "NULL", order, level_1a
+    level_1b = dplyr::if_else(
+      is.na(level_1a), class, level_1a
     )
   ) %>%
-  dplyr::select(sel_name, level_1)
+  dplyr::select(sel_name, level_1b, delete) %>% 
+  
+  dplyr::mutate(
+    level_1 = dplyr::if_else(
+      delete == "Plantae", level_1b, "delete"
+    )) %>% 
+  dplyr::select(-c(level_1b, delete))
 
 
 
@@ -648,6 +742,7 @@ classification_Latin_America <-
     .progress = TRUE,
     .x = .,
     .f = ~ taxospace::get_classification(.x, use_only_exact_match = FALSE)) %>% 
+  purrr::compact() %>% 
   bind_rows() 
 
 # adding column kingdom to know which species are actually plants
@@ -658,31 +753,46 @@ classification_Latin_America_only_plants <- classification_Latin_America %>%
     } else {
       .x$name[1]
     }
-  })) %>%
-  dplyr::filter(kingdom == c("Plantae"))
+  })) 
 
 # get table of finest classification
-get_finest_classification_Latin_America <-
+get_finest_classification_Latin_America_option_1 <-
   classification_Latin_America_only_plants %>% 
-  dplyr::select(sel_name, classification) %>% 
+  dplyr::select(sel_name, classification, kingdom) %>% 
   tidyr::unnest(classification) %>% 
   dplyr::select(-id) %>%
+  distinct(sel_name, rank, kingdom, .keep_all = TRUE) %>% 
+  dplyr::mutate(
+    delete = dplyr::if_else(
+      kingdom != "Plantae", "delete", kingdom
+    )
+  ) %>%
+  dplyr::select(-kingdom) %>% 
   pivot_wider(
-    names_from = rank, 
+    names_from = rank,
     values_from = name
   ) %>% 
+  
   dplyr::mutate(
     level_1a = dplyr::case_when(
-      genus == "NULL" ~  family,
+      is.na(genus) ~  family,
       .default = genus
     )
   ) %>% 
+  
   dplyr::mutate(
-    level_1 = dplyr::if_else(
-      level_1a == "NULL", as.list(sel_name), level_1a
+    level_1b = dplyr::if_else(
+      is.na(level_1a), class, level_1a
     )
   ) %>%
-  dplyr::select(sel_name, level_1)
+  dplyr::select(sel_name, level_1b, delete) %>% 
+  
+  dplyr::mutate(
+    level_1 = dplyr::if_else(
+      delete == "Plantae", level_1b, "delete"
+    )) %>% 
+  dplyr::select(-c(level_1b, delete))
+
 
 
 
@@ -699,6 +809,7 @@ classification_North_America <-
     .progress = TRUE,
     .x = .,
     .f = ~ taxospace::get_classification(.x, use_only_exact_match = FALSE)) %>% 
+  purrr::compact() %>% 
   bind_rows() 
 
 # adding column kingdom to know which species are actually plants
@@ -709,26 +820,46 @@ classification_North_America_only_plants <- classification_North_America %>%
     } else {
       .x$name[1]
     }
-  })) %>%
-  dplyr::filter(kingdom == c("Plantae"))
+  })) 
 
 # get table of finest classification
-get_finest_classification_North_America <-
+get_finest_classification_North_America_option_1 <-
   classification_North_America_only_plants %>% 
-  dplyr::select(sel_name, classification) %>% 
+  dplyr::select(sel_name, classification, kingdom) %>% 
   tidyr::unnest(classification) %>% 
   dplyr::select(-id) %>%
-  pivot_wider(
-    names_from = rank, 
-    values_from = name
-  ) %>% 
+  distinct(sel_name, rank, kingdom, .keep_all = TRUE) %>% 
   dplyr::mutate(
-    level_1 = dplyr::case_when(
-      genus == "NULL" ~  family,
-      .default = genus
+    delete = dplyr::if_else(
+      kingdom != "Plantae", "delete", kingdom
     )
   ) %>%
-  dplyr::select(sel_name, level_1)
+  dplyr::select(-kingdom) %>% 
+  pivot_wider(
+    names_from = rank,
+    values_from = name
+  ) %>% 
+  
+  dplyr::mutate(
+    level_1a = dplyr::case_when(
+      is.na(genus) ~  family,
+      .default = genus
+    )
+  ) %>% 
+  
+  dplyr::mutate(
+    level_1b = dplyr::if_else(
+      is.na(level_1a), class, level_1a
+    )
+  ) %>%
+  dplyr::select(sel_name, level_1b, delete) %>% 
+  
+  dplyr::mutate(
+    level_1 = dplyr::if_else(
+      delete == "Plantae", level_1b, "delete"
+    )) %>% 
+  dplyr::select(-c(level_1b, delete))
+
 
 
 #------------------------------------------------------------------------------#
@@ -743,22 +874,22 @@ joined_empty_Birks_tables_Asia_Levant
 ### harm table b ---- 
 
 # unlist
-get_finest_classification_Asia_Levant <- get_finest_classification_Asia_Levant %>% 
+get_finest_classification_Asia_Levant <- get_finest_classification_Asia_Levant_option_1 %>% 
   dplyr::mutate(
-    level_1 = map_chr(level_1, 1)
+    level_1 = as.character(level_1)
   )
 
 # merge get_finest_classification_Asia_Levant and NA_Asia_Levant_clean to get 
 # taxon_name for future merging with Birks
 
-NA_Asia_Levant_clean <- NA_Asia_Levant_clean %>% 
+NA_Asia_Levant_clean_selname <- NA_Asia_Levant_clean %>% 
   mutate(
     sel_name = taxon_clean_cap) %>% 
   select(-c(raw_name, level_1, taxon_clean, taxon_clean_cap))
 
 
 classification_with_taxon_names_Asia_Levant <- 
-  left_join(get_finest_classification_Asia_Levant, NA_Asia_Levant_clean, by = "sel_name")
+  left_join(get_finest_classification_Asia_Levant, NA_Asia_Levant_clean_selname, by = "sel_name")
 
 
 ### merge classification_with_taxon_names_Asia_Levant with Birks to final table ----
@@ -785,22 +916,22 @@ joined_empty_Birks_tables_Asia_Main
 ### harm table b ---- 
 
 # unlist
-get_finest_classification_Asia_Main <- get_finest_classification_Asia_Main %>% 
+get_finest_classification_Asia_Main <- get_finest_classification_Asia_Main_option_1 %>% 
   dplyr::mutate(
-    level_1 = map_chr(level_1, 1)
+    level_1 = as.character(level_1)
   )
 
 # merge get_finest_classification_Asia_Main and NA_Asia_Main_clean to get 
 # taxon_name for future merging with Birks
 
-NA_Asia_Main_clean <- NA_Asia_Main_clean %>% 
+NA_Asia_Main_clean_selname <- NA_Asia_Main_clean %>% 
   mutate(
     sel_name = taxon_clean_cap) %>% 
   select(-c(raw_name, level_1, taxon_clean, taxon_clean_cap))
 
 
 classification_with_taxon_names_Asia_Main <- 
-  left_join(get_finest_classification_Asia_Main, NA_Asia_Main_clean, by = "sel_name")
+  left_join(get_finest_classification_Asia_Main, NA_Asia_Main_clean_selname, by = "sel_name")
 
 
 ### merge classification_with_taxon_names_Asia_Main with Birks to final table ----
@@ -828,22 +959,22 @@ joined_empty_Birks_tables_Asia_Siberia
 ### harm table b ---- 
 
 # unlist
-get_finest_classification_Asia_Siberia <- get_finest_classification_Asia_Siberia %>% 
+get_finest_classification_Asia_Siberia <- get_finest_classification_Asia_Siberia_option_1 %>% 
   dplyr::mutate(
-    level_1 = map_chr(level_1, 1)
+    level_1 = as.character(level_1)
   )
 
 # merge get_finest_classification_Asia_Siberia and NA_Asia_Siberia_clean to get 
 # taxon_name for future merging with Birks
 
-NA_Asia_Siberia_clean <- NA_Asia_Siberia_clean %>% 
+NA_Asia_Siberia_clean_selname <- NA_Asia_Siberia_clean %>% 
   mutate(
     sel_name = taxon_clean_cap) %>% 
   select(-c(raw_name, level_1, taxon_clean, taxon_clean_cap))
 
 
 classification_with_taxon_names_Asia_Siberia <- 
-  left_join(get_finest_classification_Asia_Siberia, NA_Asia_Siberia_clean, by = "sel_name")
+  left_join(get_finest_classification_Asia_Siberia, NA_Asia_Siberia_clean_selname, by = "sel_name")
 
 
 ### merge classification_with_taxon_names_Asia_Siberia with Birks to final table ----
@@ -870,22 +1001,22 @@ joined_empty_Birks_tables_Europe
 ### harm table b ---- 
 
 # unlist
-get_finest_classification_Europe <- get_finest_classification_Europe %>% 
+get_finest_classification_Europe <- get_finest_classification_Europe_option_1 %>% 
   dplyr::mutate(
-    level_1 = map_chr(level_1, 1)
+    level_1 = as.character(level_1)
   )
 
 # merge get_finest_classification_Europe and NA_Europe_clean to get 
 # taxon_name for future merging with Birks
 
-NA_Europe_clean <- NA_Europe_clean %>% 
+NA_Europe_clean_selname <- NA_Europe_clean %>% 
   mutate(
     sel_name = taxon_clean_cap) %>% 
   select(-c(raw_name, level_1, taxon_clean, taxon_clean_cap))
 
 
 classification_with_taxon_names_Europe <- 
-  left_join(get_finest_classification_Europe, NA_Europe_clean, by = "sel_name")
+  left_join(get_finest_classification_Europe, NA_Europe_clean_selname, by = "sel_name")
 
 
 ### merge classification_with_taxon_names_Europe with Birks to final table ----
@@ -911,22 +1042,22 @@ joined_empty_Birks_tables_Indopacific
 ### harm table b ---- 
 
 # unlist
-get_finest_classification_Indopacific <- get_finest_classification_Indopacific %>% 
+get_finest_classification_Indopacific <- get_finest_classification_Indopacific_option_1 %>% 
   dplyr::mutate(
-    level_1 = map_chr(level_1, 1)
+    level_1 = as.character(level_1)
   )
 
 # merge get_finest_classification_Indopacific and NA_Indopacific_clean to get 
 # taxon_name for future merging with Birks
 
-NA_Indopacific_clean <- NA_Indopacific_clean %>% 
+NA_Indopacific_clean_selname <- NA_Indopacific_clean %>% 
   mutate(
     sel_name = taxon_clean_cap) %>% 
   select(-c(raw_name, level_1, taxon_clean, taxon_clean_cap))
 
 
 classification_with_taxon_names_Indopacific <- 
-  left_join(get_finest_classification_Indopacific, NA_Indopacific_clean, by = "sel_name")
+  left_join(get_finest_classification_Indopacific, NA_Indopacific_clean_selname, by = "sel_name")
 
 
 ### merge classification_with_taxon_names_Asia_Levant with Birks to final table ----
@@ -953,7 +1084,7 @@ joined_empty_Birks_tables_Latin_America
 ### harm table b ---- 
 
 # unlist
-get_finest_classification_Latin_America <- get_finest_classification_Latin_America %>% 
+get_finest_classification_Latin_America <- get_finest_classification_Latin_America_option_1 %>% 
   dplyr::mutate(
     level_1 = map_chr(level_1, 1)
   )
@@ -961,14 +1092,14 @@ get_finest_classification_Latin_America <- get_finest_classification_Latin_Ameri
 # merge get_finest_classification_Latin_America and NA_Latin_America_clean to get 
 # taxon_name for future merging with Birks
 
-NA_Latin_America_clean <- NA_Latin_America_clean %>% 
+NA_Latin_America_clean_selname <- NA_Latin_America_clean %>% 
   mutate(
     sel_name = taxon_clean_cap) %>% 
   select(-c(raw_name, level_1, taxon_clean, taxon_clean_cap))
 
 
 classification_with_taxon_names_Latin_America <- 
-  left_join(get_finest_classification_Latin_America, NA_Latin_America_clean, by = "sel_name")
+  left_join(get_finest_classification_Latin_America, NA_Latin_America_clean_selname, by = "sel_name")
 
 
 ### merge classification_with_taxon_names_Latin_America with Birks to final table ----
@@ -993,7 +1124,7 @@ joined_empty_Birks_tables_North_America
 
 ### harm table b ---- 
 # unlist
-get_finest_classification_North_America <- get_finest_classification_North_America %>% 
+get_finest_classification_North_America <- get_finest_classification_North_America_option_1 %>% 
   dplyr::mutate(
     level_1 = map_chr(level_1, 1)
   )
@@ -1001,14 +1132,14 @@ get_finest_classification_North_America <- get_finest_classification_North_Ameri
 # merge get_finest_classification_North_America and NA_North_America_clean to get 
 # taxon_name for future merging with Birks
 
-NA_North_America_clean <- NA_North_America_clean %>% 
+NA_North_America_clean_selname <- NA_North_America_clean %>% 
   mutate(
     sel_name = taxon_clean_cap) %>% 
   select(-c(raw_name, level_1, taxon_clean, taxon_clean_cap))
 
 
 classification_with_taxon_names_North_America <- 
-  left_join(get_finest_classification_North_America, NA_North_America_clean, by = "sel_name")
+  left_join(get_finest_classification_North_America, NA_North_America_clean_selname, by = "sel_name")
 
 
 ### merge classification_with_taxon_names_North_America with Birks to final table ----
@@ -1028,7 +1159,7 @@ harmonisation_table_North_America <- joined_empty_Birks_tables_North_America %>%
 
 ## Africa ----
 # unlist
-get_finest_classification_Africa_Naty <- get_finest_classification_Africa_Naty %>% 
+get_finest_classification_Africa <- get_finest_classification_Africa_option_1 %>% 
   dplyr::mutate(
     level_1 = as.character(level_1)
   )
@@ -1036,14 +1167,14 @@ get_finest_classification_Africa_Naty <- get_finest_classification_Africa_Naty %
 # merge get_finest_classification_Africa and NA_Africa_clean to get 
 # taxon_name 
 
-NA_Africa_clean <- NA_Africa_clean %>% 
+NA_Africa_clean_selname <- NA_Africa_clean %>% 
   mutate(
     sel_name = taxon_clean_cap) %>% 
   select(-c( taxon_clean, taxon_clean_cap))
 
 
 harmonisation_table_Africa <- 
-  left_join(get_finest_classification_Africa_Naty, NA_Africa_clean, by = "sel_name")
+  left_join(get_finest_classification_Africa, NA_Africa_clean_selname, by = "sel_name")
 
 
 
@@ -1070,34 +1201,6 @@ harmonisation_tables_df <- tibble(
   harm_table = harmonisation_tables
 )
 
-
-#----------------------------------------------------------#
-# 9. Harmonise data -----
-#----------------------------------------------------------#
-data_harmonised <-
-  RFossilpol::harmonise_all_regions(
-    data_source = data_with_chronologies,
-    harmonisation_tables = harmonisation_tables_df,
-    original_name = "taxon_name",
-    harm_level = "level_1", # [USER] Change the levels if needed
-    exclude_taxa = "delete",
-    pollen_grain_test = TRUE # [USER] Turn FALSE to hide progress
-  )
-
-
-#----------------------------------------------------------#
-# 10. Save the data -----
-#----------------------------------------------------------#
-
-RUtilpol::save_latest_file(
-  object_to_save = data_harmonised,
-  dir = paste0(
-    data_storage_path, # [config_criteria]
-    "/Data/Processed/Data_harmonised"
-  ),
-  prefered_format = "rds",
-  use_sha = TRUE
-)
 
 
 
