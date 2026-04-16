@@ -350,16 +350,7 @@ get_finest_classification_Africa_option_1 <-
   tidyr::unnest(classification) %>% 
   dplyr::select(-id) %>%
   distinct(sel_name, rank, kingdom, .keep_all = TRUE) %>% 
-  # pivot_wider(
-  #  names_from = kingdom, 
-  # values_from = name
-  # ) %>% 
-  #  dplyr::mutate(
-  #   level_1 = dplyr::case_when(
-  #      .default = Plantae,
-  #     is.na(Plantae) ~ "delete"
-  #  )
-  # ) %>% 
+ 
   dplyr::mutate(
     delete = dplyr::if_else(
       kingdom != "Plantae", "delete", kingdom
@@ -371,11 +362,6 @@ get_finest_classification_Africa_option_1 <-
     values_from = name
   ) %>% 
   
- # dplyr::select(sel_name, rank, level_1) %>% 
- #  pivot_wider(
- #   names_from = rank, 
- #  values_from = level_1
- # ) %>% 
   dplyr::mutate(
     level_1a = dplyr::case_when(
       is.na(genus) ~  family,
