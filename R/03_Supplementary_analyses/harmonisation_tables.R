@@ -332,6 +332,21 @@ classification_Africa_only_plants <- classification_Africa %>%
 get_finest_classification_Africa_option_1 <-
   classification_Africa_only_plants %>%
   dplyr::select(sel_name, classification, kingdom) %>% 
+  
+  dplyr::mutate(
+    classification = purrr::map(classification, ~ {
+      if (is.null(.x)) {
+        tibble::tibble(
+          name = NA_character_,
+          rank = NA_character_,
+          id = NA_integer_
+        )
+      } else {
+        .x
+      }
+    })
+  ) %>% 
+  
   tidyr::unnest(classification) %>% 
   dplyr::select(-id) %>%
   distinct(sel_name, rank, kingdom, .keep_all = TRUE) %>% 
@@ -419,6 +434,21 @@ classification_Asia_Levant_only_plants <- classification_Asia_Levant %>%
 get_finest_classification_Asia_Levant_option_1 <-
 classification_Asia_Levant_only_plants %>% 
   dplyr::select(sel_name, classification, kingdom) %>% 
+  
+  dplyr::mutate(
+    classification = purrr::map(classification, ~ {
+      if (is.null(.x)) {
+        tibble::tibble(
+          name = NA_character_,
+          rank = NA_character_,
+          id = NA_integer_
+        )
+      } else {
+        .x
+      }
+    })
+  ) %>% 
+  
   tidyr::unnest(classification) %>% 
   dplyr::select(-id) %>%
   distinct(sel_name, rank, kingdom, .keep_all = TRUE) %>% 
@@ -488,6 +518,21 @@ classification_Asia_Main_only_plants <- classification_Asia_Main %>%
 get_finest_classification_Asia_Main_option_1 <-
   classification_Asia_Main_only_plants %>% 
   dplyr::select(sel_name, classification, kingdom) %>% 
+  
+  dplyr::mutate(
+    classification = purrr::map(classification, ~ {
+      if (is.null(.x)) {
+        tibble::tibble(
+          name = NA_character_,
+          rank = NA_character_,
+          id = NA_integer_
+        )
+      } else {
+        .x
+      }
+    })
+  ) %>% 
+  
   tidyr::unnest(classification) %>% 
   dplyr::select(-id) %>%
   distinct(sel_name, rank, kingdom, .keep_all = TRUE) %>% 
@@ -557,6 +602,21 @@ classification_Asia_Siberia_only_plants <- classification_Asia_Siberia %>%
 get_finest_classification_Asia_Siberia_option_1 <-
   classification_Asia_Siberia_only_plants %>% 
   dplyr::select(sel_name, classification, kingdom) %>% 
+  
+  dplyr::mutate(
+    classification = purrr::map(classification, ~ {
+      if (is.null(.x)) {
+        tibble::tibble(
+          name = NA_character_,
+          rank = NA_character_,
+          id = NA_integer_
+        )
+      } else {
+        .x
+      }
+    })
+  ) %>% 
+  
   tidyr::unnest(classification) %>% 
   dplyr::select(-id) %>%
   distinct(sel_name, rank, kingdom, .keep_all = TRUE) %>% 
@@ -624,6 +684,21 @@ classification_Europe_only_plants <- classification_Europe %>%
 get_finest_classification_Europe_option_1 <-
   classification_Europe_only_plants %>% 
   dplyr::select(sel_name, classification, kingdom) %>% 
+  
+  dplyr::mutate(
+    classification = purrr::map(classification, ~ {
+      if (is.null(.x)) {
+        tibble::tibble(
+          name = NA_character_,
+          rank = NA_character_,
+          id = NA_integer_
+        )
+      } else {
+        .x
+      }
+    })
+  ) %>% 
+  
   tidyr::unnest(classification) %>% 
   dplyr::select(-id) %>%
   distinct(sel_name, rank, kingdom, .keep_all = TRUE) %>% 
@@ -692,6 +767,21 @@ classification_Indopacific_only_plants <- classification_Indopacific %>%
 get_finest_classification_Indopacific_option_1 <-
   classification_Indopacific_only_plants %>% 
   dplyr::select(sel_name, classification, kingdom) %>% 
+  
+  dplyr::mutate(
+    classification = purrr::map(classification, ~ {
+      if (is.null(.x)) {
+        tibble::tibble(
+          name = NA_character_,
+          rank = NA_character_,
+          id = NA_integer_
+        )
+      } else {
+        .x
+      }
+    })
+  ) %>% 
+  
   tidyr::unnest(classification) %>% 
   dplyr::select(-id) %>%
   distinct(sel_name, rank, kingdom, .keep_all = TRUE) %>% 
@@ -759,6 +849,21 @@ classification_Latin_America_only_plants <- classification_Latin_America %>%
 get_finest_classification_Latin_America_option_1 <-
   classification_Latin_America_only_plants %>% 
   dplyr::select(sel_name, classification, kingdom) %>% 
+  
+  dplyr::mutate(
+    classification = purrr::map(classification, ~ {
+      if (is.null(.x)) {
+        tibble::tibble(
+          name = NA_character_,
+          rank = NA_character_,
+          id = NA_integer_
+        )
+      } else {
+        .x
+      }
+    })
+  ) %>% 
+  
   tidyr::unnest(classification) %>% 
   dplyr::select(-id) %>%
   distinct(sel_name, rank, kingdom, .keep_all = TRUE) %>% 
@@ -826,6 +931,21 @@ classification_North_America_only_plants <- classification_North_America %>%
 get_finest_classification_North_America_option_1 <-
   classification_North_America_only_plants %>% 
   dplyr::select(sel_name, classification, kingdom) %>% 
+  
+  dplyr::mutate(
+    classification = purrr::map(classification, ~ {
+      if (is.null(.x)) {
+        tibble::tibble(
+          name = NA_character_,
+          rank = NA_character_,
+          id = NA_integer_
+        )
+      } else {
+        .x
+      }
+    })
+  ) %>% 
+  
   tidyr::unnest(classification) %>% 
   dplyr::select(-id) %>%
   distinct(sel_name, rank, kingdom, .keep_all = TRUE) %>% 
